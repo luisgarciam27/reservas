@@ -1,0 +1,6 @@
+{
+  "name": "MarIA — Reservas y WhatsApp",
+  "description": "Sistema inteligente de reservas y recordatorios automáticos por WhatsApp para negocios, creado por MarIA en Huancayo, Perú.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
