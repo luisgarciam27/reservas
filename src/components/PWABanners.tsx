@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, RefreshCw, Share, WifiOff, X } from 'lucide-react';
+import { Download, Share, WifiOff, X } from 'lucide-react';
 import { useOnlineStatus, usePWAInstall, useSWUpdate } from '../hooks/usePWA';
 
 export const PWAInstallBanner: React.FC<{
@@ -140,35 +140,9 @@ export const PWAInstallBanner: React.FC<{
 };
 
 export const SWUpdateBanner: React.FC = () => {
-  const { needRefresh, applyUpdate, dismissUpdate } = useSWUpdate();
-
-  if (!needRefresh) return null;
-
-  return (
-    <div
-      role="status"
-      className="fixed top-3 left-3 right-3 z-50 mx-auto max-w-md rounded-2xl bg-slate-900 p-3 text-white shadow-lg"
-    >
-      <div className="flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={applyUpdate}
-          className="tap-feedback flex min-h-[44px] flex-1 items-center gap-2.5 text-left text-xs font-semibold"
-        >
-          <RefreshCw className="h-4 w-4 shrink-0 text-emerald-400" aria-hidden="true" />
-          <span>Hay una nueva versión, toca para actualizar</span>
-        </button>
-        <button
-          type="button"
-          onClick={dismissUpdate}
-          aria-label="Cerrar notificación de actualización"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-400 hover:text-white"
-        >
-          <X className="h-4 w-4" aria-hidden="true" />
-        </button>
-      </div>
-    </div>
-  );
+  // Mantiene el registro silencioso del Service Worker sin mostrar aviso flotante
+  useSWUpdate();
+  return null;
 };
 
 export const OfflineNoticeInline: React.FC = () => {

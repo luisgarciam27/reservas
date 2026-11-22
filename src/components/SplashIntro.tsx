@@ -40,7 +40,7 @@ export const SplashIntro: React.FC = () => {
             MarIA Reservas
           </p>
           <p className="mt-1 text-xs font-medium text-indigo-300">
-            Huancayo · Inteligencia y WhatsApp
+            Reservas online · Inteligencia y WhatsApp
           </p>
         </div>
       </div>

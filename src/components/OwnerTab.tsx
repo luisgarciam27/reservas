@@ -511,7 +511,7 @@ export const OwnerTab: React.FC<OwnerTabProps> = ({
         <section aria-label="Modo Calendario" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-base font-bold text-slate-950">
-              Calendario Semanal · Huancayo
+              Calendario Semanal
             </h3>
             <span className="text-xs font-medium text-slate-500">
               {citas.length} citas programadas

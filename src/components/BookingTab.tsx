@@ -6,8 +6,11 @@ import {
   Check,
   CheckCircle2,
   Clock,
+  Download,
+  MapPin,
   MessageCircle,
   RefreshCw,
+  UserCheck,
   WifiOff,
 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -19,10 +22,12 @@ import {
   OfflineBookingError,
   SlotTakenError,
 } from '../lib/supabase';
+import type { UserSession } from '../types/app';
 
 export interface BookedSummary {
   cliente: string;
   telefono: string;
+  ciudad?: string;
   servicio: string;
   precio: number;
   fecha: string;
@@ -34,10 +39,18 @@ export interface BookedSummary {
 
 interface BookingTabProps {
   rubro: RubroConfig;
+  session: UserSession;
   initialService?: ServicioItem | null;
   onBackToLanding: () => void;
   onBookingCreated: (summary: BookedSummary) => void;
-  onGoToReminder: () => void;
+  onRegisterClient: (params: {
+    telefono: string;
+    nombre: string;
+    ciudad: string;
+  }) => void;
+  onOpenInstallModal: () => void;
+  onOpenAuthSheet: (mode?: 'register' | 'login' | 'owner') => void;
+  onGoToProfile: () => void;
 }
 
 function getLimaTodayStr(): string {
@@ -93,10 +106,14 @@ function formatReadableDate(ymd: string): string {
 
 export const BookingTab: React.FC<BookingTabProps> = ({
   rubro,
+  session,
   initialService = null,
   onBackToLanding,
   onBookingCreated,
-  onGoToReminder,
+  onRegisterClient,
+  onOpenInstallModal,
+  onOpenAuthSheet,
+  onGoToProfile,
 }) => {
   const isOnline = useOnlineStatus();
   const todayYmd = useMemo(() => getLimaTodayStr(), []);
@@ -120,13 +137,25 @@ export const BookingTab: React.FC<BookingTabProps> = ({
     useState<boolean>(false);
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
 
-  // Datos del formulario
-  const [nombre, setNombre] = useState<string>('');
-  const [celular, setCelular] = useState<string>('');
+  // Datos del formulario (auto-completados si el usuario ya está registrado)
+  const [nombre, setNombre] = useState<string>(() =>
+    session.role === 'client' ? session.nombre : ''
+  );
+  const [celular, setCelular] = useState<string>(() =>
+    session.role === 'client' ? session.telefono : ''
+  );
+  const [ciudad, setCiudad] = useState<string>(() =>
+    session.ciudad || 'Lima'
+  );
+  const [guardarComoRegistrado, setGuardarComoRegistrado] = useState<boolean>(
+    () => session.role === 'guest'
+  );
   const [motivo, setMotivo] = useState<string>('');
   const [nombreMascota, setNombreMascota] = useState<string>('');
   const [tipoMascota, setTipoMascota] = useState<string>('Perro');
-  const [aceptaWhatsapp, setAceptaWhatsapp] = useState<boolean>(false);
+  const [aceptaWhatsapp, setAceptaWhatsapp] = useState<boolean>(
+    () => session.role === 'client'
+  );
 
   // Envío
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -135,6 +164,16 @@ export const BookingTab: React.FC<BookingTabProps> = ({
     useState<boolean>(false);
   const [confirmedBooking, setConfirmedBooking] =
     useState<BookedSummary | null>(null);
+
+  // Sincronizar si el usuario inicia sesión mientras está en el flujo
+  useEffect(() => {
+    if (session.role === 'client') {
+      if (session.nombre) setNombre(session.nombre);
+      if (session.telefono) setCelular(session.telefono);
+      if (session.ciudad) setCiudad(session.ciudad);
+      setAceptaWhatsapp(true);
+    }
+  }, [session.role, session.nombre, session.telefono, session.ciudad]);
 
   // Al cambiar de rubro o servicio preseleccionado, sincronizar el flujo limpiamente
   useEffect(() => {
@@ -297,6 +336,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
       const summary: BookedSummary = {
         cliente: nombre.trim(),
         telefono: celular.trim(),
+        ciudad: ciudad.trim() || 'Lima',
         servicio: selectedService.nombre,
         precio: selectedService.precio,
         fecha,
@@ -306,6 +346,15 @@ export const BookingTab: React.FC<BookingTabProps> = ({
           rubro.id === 'veterinaria' ? nombreMascota.trim() : undefined,
         tipoMascota: rubro.id === 'veterinaria' ? tipoMascota : undefined,
       };
+
+      // Si el invitado marcó guardar perfil o si ya es cliente, actualizar registro con teléfono, nombre y ciudad
+      if (session.role === 'guest' && guardarComoRegistrado) {
+        onRegisterClient({
+          telefono: celular.trim(),
+          nombre: nombre.trim(),
+          ciudad: ciudad.trim() || 'Lima',
+        });
+      }
 
       setConfirmedBooking(summary);
       onBookingCreated(summary);
@@ -332,11 +381,13 @@ export const BookingTab: React.FC<BookingTabProps> = ({
     setConfirmedBooking(null);
     setSelectedService(null);
     setHora('');
-    setNombre('');
-    setCelular('');
+    if (session.role !== 'client') {
+      setNombre('');
+      setCelular('');
+    }
     setMotivo('');
     setNombreMascota('');
-    setAceptaWhatsapp(false);
+    setAceptaWhatsapp(session.role === 'client');
     setSubmitError(null);
     setStep(1);
   };
@@ -413,12 +464,20 @@ export const BookingTab: React.FC<BookingTabProps> = ({
           <div className="mt-6 flex w-full flex-col gap-2.5">
             <button
               type="button"
-              onClick={onGoToReminder}
+              onClick={onGoToProfile}
               style={{ backgroundColor: rubro.colores.primario }}
               className="tap-feedback flex min-h-[50px] w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold text-white shadow-xs"
             >
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              Ver cómo llegará su recordatorio
+              Ver Mi Perfil y Recordatorios
+            </button>
+            <button
+              type="button"
+              onClick={onOpenInstallModal}
+              className="tap-feedback flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 text-sm font-semibold text-indigo-800 hover:bg-indigo-100"
+            >
+              <Download className="h-4 w-4" aria-hidden="true" />
+              Descargar App al móvil
             </button>
             <button
               type="button"
@@ -442,12 +501,54 @@ export const BookingTab: React.FC<BookingTabProps> = ({
           className="tap-feedback inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-2 text-xs font-semibold text-slate-700 hover:bg-white"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          Volver a información y servicios
+          Volver al inicio
         </button>
         <span className="text-xs font-medium text-slate-500">
-          Agenda en línea
+          {session.role === 'client'
+            ? `Perfil: ${session.nombre}`
+            : 'Reserva sin cuenta o con perfil'}
         </span>
       </div>
+
+      {/* Acceso previo rápido: Invitado vs Registrarse con Teléfono, Nombre, Ciudad */}
+      {session.role === 'guest' ? (
+        <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs">
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-slate-900">
+                ¿Cómo prefieres sacar tu cita?
+              </p>
+              <p className="mt-0.5 text-[11px] text-slate-600">
+                Puedes reservar directo sin crear usuario, o registrarte con tu teléfono, nombre y ciudad para guardar tu historial.
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onOpenAuthSheet('register')}
+                className="tap-feedback min-h-[40px] rounded-xl border border-slate-300 bg-slate-50 px-3 text-xs font-bold text-slate-800 hover:bg-slate-100 whitespace-nowrap"
+              >
+                Registrarme antes
+              </button>
+              <button
+                type="button"
+                onClick={onOpenInstallModal}
+                className="tap-feedback inline-flex min-h-[40px] items-center gap-1 rounded-xl border border-indigo-200 bg-indigo-50 px-3 text-xs font-bold text-indigo-800 hover:bg-indigo-100 whitespace-nowrap"
+              >
+                <Download className="h-3.5 w-3.5" />
+                App móvil
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-2.5 text-xs text-emerald-900">
+          <span className="inline-flex items-center gap-1.5 font-semibold">
+            <UserCheck className="h-4 w-4 text-emerald-700" />
+            Tus datos ({session.nombre} · {session.ciudad}) se completarán automáticamente.
+          </span>
+        </div>
+      )}
 
       {/* Indicador de pasos */}
       <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xs">
@@ -876,8 +977,32 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                 />
               </div>
               <p className="mt-1 text-xs text-slate-500">
-                9 dígitos, debe empezar con 9.
+                9 dígitos, debe empezar con 9. Será tu clave para ver tus citas.
               </p>
+            </div>
+
+            {/* Ciudad */}
+            <div>
+              <label
+                htmlFor="cliente-ciudad"
+                className="block text-sm font-semibold text-slate-900"
+              >
+                Ciudad
+              </label>
+              <div className="relative mt-1.5">
+                <MapPin
+                  className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
+                />
+                <input
+                  id="cliente-ciudad"
+                  type="text"
+                  placeholder="Ej. Lima, Arequipa, Bogotá..."
+                  value={ciudad}
+                  onChange={(e) => setCiudad(e.target.value)}
+                  className="min-h-[48px] w-full rounded-xl border border-slate-300 bg-white pl-10 pr-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none"
+                />
+              </div>
             </div>
 
             {/* Campos extra por rubro */}
@@ -955,6 +1080,24 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Opción de guardar perfil si es invitado */}
+            {session.role === 'guest' && (
+              <label className="flex min-h-[52px] cursor-pointer items-start gap-3 rounded-2xl border border-indigo-200 bg-indigo-50/60 p-3.5">
+                <input
+                  type="checkbox"
+                  checked={guardarComoRegistrado}
+                  onChange={(e) => setGuardarComoRegistrado(e.target.checked)}
+                  className="mt-0.5 h-5 w-5 shrink-0 rounded-md border-slate-300 accent-indigo-600"
+                />
+                <span className="text-xs leading-relaxed text-slate-700">
+                  <strong className="text-slate-900">
+                    Crear mi perfil con mi teléfono, nombre y ciudad
+                  </strong>{' '}
+                  para consultar mi historial y recordatorios en la app. (Desmarca si prefieres reservar sin registro).
+                </span>
+              </label>
             )}
 
             {/* Consentimiento WhatsApp */}

@@ -4,6 +4,54 @@
   :root {
     --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --font-outfit: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    --bg: #F4F7FB;
+    --card: #FFFFFF;
+    --line: #D9E2EC;
+    --ink: #0F0A2E;
+    --sub: #4B5470;
+    --p: #5B21B6;
+    --ps: #EDE9FE;
+    --cy: #0891B2;
+    --cys: #E0F7FB;
+    --cyt: #0E7490;
+    --onp: #FFFFFF;
+    --oncy: #FFFFFF;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #0C0A1D;
+      --card: #15122B;
+      --line: #2A2650;
+      --ink: #F3F0FF;
+      --sub: #B9B2D9;
+      --p: #A78BFA;
+      --ps: #241B4D;
+      --cy: #22D3EE;
+      --cys: #0C2F3B;
+      --cyt: #67E8F9;
+      --onp: #0C0A1D;
+      --oncy: #0C0A1D;
+    }
+  }
+
+  :root[data-theme='dark'],
+  .dark {
+    --bg: #0C0A1D;
+    --card: #15122B;
+    --line: #2A2650;
+    --ink: #F3F0FF;
+    --sub: #B9B2D9;
+    --p: #A78BFA;
+    --ps: #241B4D;
+    --cy: #22D3EE;
+    --cys: #0C2F3B;
+    --cyt: #67E8F9;
+    --onp: #0C0A1D;
+    --oncy: #0C0A1D;
   }
 
   html {
@@ -29,6 +77,16 @@
 
 .font-display-serif {
   font-family: var(--font-serif);
+}
+
+.font-outfit {
+  font-family: var(--font-outfit);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.font-inter {
+  font-family: var(--font-inter);
 }
 
 .tabular-nums {
@@ -71,11 +129,35 @@
   animation: shimmer 1.35s infinite linear;
 }
 
+@keyframes maria-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.maria-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: maria-marquee 42s linear infinite;
+  will-change: transform;
+}
+
+.maria-marquee-wrapper:hover .maria-marquee-track,
+.maria-marquee-track[data-paused='true'] {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tap-feedback:active:not(:disabled) {
     transform: none;
   }
   .skeleton-shimmer {
+    animation: none;
+  }
+  .maria-marquee-track {
     animation: none;
   }
 }

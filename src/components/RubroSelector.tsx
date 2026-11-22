@@ -1,203 +1,342 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Calendar, CheckCircle2, MessageSquare, Moon, ShieldCheck, Sparkles, Sun, TrendingUp } from 'lucide-react';
+import {
+  ArrowRight,
+  Bell,
+  Briefcase,
+  CalendarCheck2,
+  Moon,
+  Smartphone,
+  Sparkles,
+  Sun,
+  Tag,
+  User,
+} from 'lucide-react';
 import { RUBROS, type RubroConfig, type RubroKey } from '../config/rubros';
-import { PWAInstallBanner } from './PWABanners';
+import type { UserSession } from '../types/app';
 import { MariaLogoMark, RubroSvgIcon } from './RubroIcons';
 
 interface RubroSelectorProps {
+  session: UserSession;
   onSelectRubro: (rubro: RubroKey) => void;
+  onOpenAuthSheet: (mode?: 'register' | 'login' | 'owner') => void;
 }
 
+type ThemeMode = 'light' | 'dark';
+
+const THEME_STORAGE_KEY = 'maria_theme_preference';
 const RUBRO_ORDER: RubroKey[] = ['consultorio', 'salon', 'veterinaria'];
 
+const RUBRO_SOLUTIONS: Record<RubroKey, string> = {
+  consultorio: 'Evita cruces en recepción y ordena fichas de pacientes.',
+  salon: 'Muestra tu catálogo visual, promos flash y fideliza clientas.',
+  veterinaria: 'Historial por mascota, vacunas y turnos de baño sin esperas.',
+};
+
+function getInitialTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'light';
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+  } catch {
+    // Ignorar
+  }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
+}
+
 export const RubroSelector: React.FC<RubroSelectorProps> = ({
+  session,
   onSelectRubro,
+  onOpenAuthSheet,
 }) => {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem('maria_theme');
-      if (saved) return saved === 'dark';
-    } catch {
-      // Ignorar
-    }
-    return true; // Por defecto oscuro para MarIA
-  });
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
 
   useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    root.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const next: ThemeMode = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
     try {
-      localStorage.setItem('maria_theme', isDark ? 'dark' : 'light');
+      localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {
       // Ignorar
     }
-  }, [isDark]);
+  };
+
+  const handleDownloadLogo = () => {
+    const svgString = `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="512" height="512">
+      <rect width="40" height="40" rx="11" fill="#EDE9FE"/>
+      <rect x="8.5" y="11" width="23" height="20.5" rx="4" stroke="#5B21B6" stroke-width="2.4" fill="#FFFFFF"/>
+      <path d="M8.5 16.5H31.5" stroke="#5B21B6" stroke-width="2.2"/>
+      <path d="M14.5 8V12.5" stroke="#5B21B6" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M25.5 8V12.5" stroke="#5B21B6" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M20 19.2L21.15 22.35L24.3 23.5L21.15 24.65L20 27.8L18.85 24.65L15.7 23.5L18.85 22.35L20 19.2Z" fill="#0891B2"/>
+    </svg>`;
+
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, 512, 512);
+        const pngUrl = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = pngUrl;
+        a.download = 'maria-citas-logo.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    };
+    img.src = url;
+  };
 
   return (
     <div
-      className={`min-h-[100dvh] flex flex-col relative overflow-hidden transition-colors duration-300 ${
-        isDark
-          ? 'bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 text-white'
-          : 'bg-gradient-to-b from-slate-50 via-indigo-50/40 to-slate-100 text-slate-900'
-      }`}
+      className="font-inter min-h-[calc(100dvh-50px)] flex flex-col"
+      style={{ backgroundColor: 'var(--bg)', color: 'var(--ink)' }}
     >
-      {/* Círculos de luz decorativos de fondo */}
-      <div
-        aria-hidden="true"
-        className={`absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none transition-colors duration-500 ${
-          isDark ? 'bg-indigo-600/25' : 'bg-indigo-300/40'
-        }`}
-      />
-      <div
-        aria-hidden="true"
-        className={`absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none transition-colors duration-500 ${
-          isDark ? 'bg-emerald-600/20' : 'bg-emerald-300/40'
-        }`}
-      />
-
-      {/* Cabecera de marca */}
+      {/* Cabecera limpia en una sola fila */}
       <header
-        className={`relative z-10 w-full border-b backdrop-blur-md transition-colors duration-300 ${
-          isDark
-            ? 'border-white/10 bg-slate-950/60 text-white'
-            : 'border-slate-200 bg-white/80 text-slate-900'
-        }`}
+        className="w-full"
+        style={{
+          backgroundColor: 'var(--card)',
+          borderBottom: '1px solid var(--line)',
+        }}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
-          <div className="flex items-center gap-3">
-            <MariaLogoMark className="h-9 w-9 shrink-0 shadow-lg shadow-indigo-500/30" />
-            <div className="flex flex-col">
-              <span
-                className={`text-lg font-extrabold tracking-tight ${
-                  isDark ? 'text-white' : 'text-slate-900'
-                }`}
-              >
-                MarIA
-              </span>
-              <span
-                className={`text-[10px] font-medium uppercase tracking-wider ${
-                  isDark ? 'text-indigo-300' : 'text-indigo-600'
-                }`}
-              >
-                Reservas & WhatsApp
-              </span>
-            </div>
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <MariaLogoMark className="h-8 w-8 shrink-0" />
+            <span
+              className="font-outfit text-[18px] sm:text-[20px] leading-none whitespace-nowrap"
+              style={{ color: 'var(--ink)' }}
+            >
+              Mar<span style={{ color: 'var(--p)' }}>IA</span> Citas
+            </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div
-              className={`hidden sm:flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-medium backdrop-blur-sm ${
-                isDark
-                  ? 'bg-white/10 text-indigo-200'
-                  : 'bg-slate-200/70 text-indigo-900'
-              }`}
-            >
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Sistema activo 24/7</span>
-            </div>
-
-            {/* Botón Modo Oscuro / Claro */}
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setIsDark((prev) => !prev)}
-              aria-label="Cambiar modo oscuro o claro"
-              className={`tap-feedback flex h-10 w-10 items-center justify-center rounded-xl border transition-colors ${
-                isDark
-                  ? 'border-white/15 bg-white/10 text-amber-300 hover:bg-white/20'
-                  : 'border-slate-300 bg-white text-indigo-600 shadow-2xs hover:bg-slate-100'
-              }`}
+              onClick={() =>
+                onOpenAuthSheet(session.role === 'owner' ? 'owner' : 'login')
+              }
+              className="tap-feedback inline-flex min-h-[40px] items-center gap-1.5 rounded-[12px] px-3 text-[13px] font-medium whitespace-nowrap"
+              style={{
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--line)',
+                color: 'var(--ink)',
+              }}
             >
-              {isDark ? (
-                <Sun className="h-5 w-5" aria-hidden="true" />
+              {session.role === 'owner' ? (
+                <>
+                  <Briefcase
+                    className="h-3.5 w-3.5"
+                    style={{ color: 'var(--cyt)' }}
+                  />
+                  <span>Panel Dueño</span>
+                </>
+              ) : session.role === 'client' ? (
+                <>
+                  <User
+                    className="h-3.5 w-3.5"
+                    style={{ color: 'var(--p)' }}
+                  />
+                  <span>{session.nombre.split(' ')[0]}</span>
+                </>
               ) : (
-                <Moon className="h-5 w-5" aria-hidden="true" />
+                <>
+                  <User className="h-3.5 w-3.5" />
+                  <span>Probar acceso</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={
+                theme === 'dark'
+                  ? 'Cambiar a modo claro'
+                  : 'Cambiar a modo oscuro'
+              }
+              className="tap-feedback flex h-10 w-10 items-center justify-center rounded-[12px]"
+              style={{
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--line)',
+                color: 'var(--ink)',
+              }}
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Moon className="h-4 w-4" aria-hidden="true" />
               )}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Contenido principal con enfoque de ventas B2B */}
-      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-4 py-8 sm:px-8 sm:py-16">
+      {/* Contenido directo: cómo soluciona el negocio + elección de App demo */}
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-4 py-8 sm:px-6 sm:py-10">
         <div className="mx-auto max-w-3xl text-center">
           <div
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold mb-4 shadow-sm ${
-              isDark
-                ? 'bg-indigo-500/20 border-indigo-500/30 text-indigo-200'
-                : 'bg-indigo-100/80 border-indigo-200 text-indigo-800'
-            }`}
+            className="inline-flex items-center gap-1.5 rounded-[12px] px-3 py-1.5 text-[13px] font-medium"
+            style={{
+              backgroundColor: 'var(--cys)',
+              color: 'var(--cyt)',
+            }}
           >
-            <Sparkles
-              className={`h-4 w-4 ${
-                isDark ? 'text-amber-300' : 'text-amber-500'
-              } animate-pulse`}
-            />
-            <span>Solución definitiva anti-inasistencias para negocios</span>
+            <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span>Demo interactivo · App de Citas 24/7</span>
           </div>
 
           <h1
-            className={`text-3xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl [text-wrap:balance] ${
-              isDark ? 'text-white' : 'text-slate-900'
-            }`}
+            className="font-outfit mt-3.5 text-[32px] leading-[1.08] sm:text-[46px] [text-wrap:balance]"
+            style={{ color: 'var(--ink)' }}
           >
-            ¡Llena tu agenda y dile adiós a los clientes que{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400">
-              no se presentan!
-            </span>
+            Tu negocio con su propia{' '}
+            <span style={{ color: 'var(--p)' }}>App de citas</span>
           </h1>
 
           <p
-            className={`mt-5 text-base leading-relaxed sm:text-lg ${
-              isDark ? 'text-slate-300' : 'text-slate-600'
-            }`}
+            className="mt-3 text-[16px] sm:text-[18px] leading-[1.55]"
+            style={{ color: 'var(--sub)' }}
           >
-            Tus clientes reservan solos las 24 horas, reciben recordatorios
-            automáticos en su WhatsApp y tú recuperas hasta <strong>S/ 3,500 al mes</strong> en citas que antes se perdían.
+            Tus clientes ven horarios reales, eligen servicio y reservan solos directo desde tu App, sin esperar que respondas mensajes.{' '}
+            <strong style={{ color: 'var(--ink)' }}>
+              Elige un rubro y pruébala en vivo:
+            </strong>
           </p>
+        </div>
 
-          {/* Barra de beneficios rápidos estilo vendedor */}
-          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {/* 3 soluciones concretas para el negocio */}
+        <div className="mx-auto mt-6 grid w-full max-w-5xl grid-cols-1 gap-3 sm:grid-cols-3">
+          <div
+            className="flex items-start gap-3 rounded-[14px] p-3.5"
+            style={{
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--line)',
+            }}
+          >
             <div
-              className={`flex items-center justify-center gap-2 rounded-2xl border p-3 text-xs font-semibold ${
-                isDark
-                  ? 'border-white/10 bg-white/5 text-slate-200'
-                  : 'border-slate-200 bg-white/80 text-slate-800 shadow-2xs'
-              }`}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+              style={{
+                backgroundColor: 'var(--ps)',
+                color: 'var(--p)',
+              }}
             >
-              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-              <span>Reservas 24/7 sin llamadas</span>
+              <CalendarCheck2 className="h-4 w-4" aria-hidden="true" />
             </div>
-            <div
-              className={`flex items-center justify-center gap-2 rounded-2xl border p-3 text-xs font-semibold ${
-                isDark
-                  ? 'border-white/10 bg-white/5 text-slate-200'
-                  : 'border-slate-200 bg-white/80 text-slate-800 shadow-2xs'
-              }`}
-            >
-              <TrendingUp className="h-4 w-4 text-indigo-400 shrink-0" />
-              <span>Reduce inasistencias un 50%</span>
+            <div className="min-w-0">
+              <p
+                className="text-[14px] font-semibold"
+                style={{ color: 'var(--ink)' }}
+              >
+                Agenda llena sin chatear
+              </p>
+              <p
+                className="mt-0.5 text-[13px] leading-[1.45]"
+                style={{ color: 'var(--sub)' }}
+              >
+                Reservas en 3 toques las 24 horas con tu propio enlace.
+              </p>
             </div>
+          </div>
+
+          <div
+            className="flex items-start gap-3 rounded-[14px] p-3.5"
+            style={{
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--line)',
+            }}
+          >
             <div
-              className={`flex items-center justify-center gap-2 rounded-2xl border p-3 text-xs font-semibold ${
-                isDark
-                  ? 'border-white/10 bg-white/5 text-slate-200'
-                  : 'border-slate-200 bg-white/80 text-slate-800 shadow-2xs'
-              }`}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+              style={{
+                backgroundColor: 'rgba(245, 158, 11, 0.14)',
+                color: '#F59E0B',
+              }}
             >
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-              <span>Recordatorios WhatsApp</span>
+              <Tag className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <p
+                className="text-[14px] font-semibold"
+                style={{ color: 'var(--ink)' }}
+              >
+                Más ventas con Promos
+              </p>
+              <p
+                className="mt-0.5 text-[13px] leading-[1.45]"
+                style={{ color: 'var(--sub)' }}
+              >
+                Llena horas vacías con descuentos y vende productos extras.
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="flex items-start gap-3 rounded-[14px] p-3.5"
+            style={{
+              backgroundColor: 'var(--card)',
+              border: '1px solid var(--line)',
+            }}
+          >
+            <div
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+              style={{
+                backgroundColor: 'var(--cys)',
+                color: 'var(--cyt)',
+              }}
+            >
+              <Bell className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <p
+                className="text-[14px] font-semibold"
+                style={{ color: 'var(--ink)' }}
+              >
+                Cero cruces ni olvidos
+              </p>
+              <p
+                className="mt-0.5 text-[13px] leading-[1.45]"
+                style={{ color: 'var(--sub)' }}
+              >
+                Horarios bloqueados al instante y avisos automáticos.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Sección de llamadas a la acción / Elección de rubro con fotos */}
-        <div className="mt-12 text-center">
-          <p className="text-sm font-bold uppercase tracking-wider text-indigo-400">
-            👇 Selecciona tu rubro y prueba la demo en vivo ahora mismo:
-          </p>
-        </div>
+        {session.role === 'owner' && (
+          <div
+            className="mx-auto mt-5 w-full max-w-2xl rounded-[12px] p-3 text-center"
+            style={{
+              backgroundColor: 'var(--cys)',
+              border: '1px solid var(--cy)',
+              color: 'var(--cyt)',
+            }}
+          >
+            <p className="text-[13px] font-medium">
+              Sesión de Dueño activa (+51 {session.telefono}). Elige un negocio para abrir su Panel de Gestión.
+            </p>
+          </div>
+        )}
 
         <section
-          aria-label="Seleccionar rubro de negocio"
-          className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+          aria-label="Seleccionar rubro para probar la App de citas"
+          className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
         >
           {RUBRO_ORDER.map((key) => {
             const item: RubroConfig = RUBROS[key];
@@ -206,72 +345,84 @@ export const RubroSelector: React.FC<RubroSelectorProps> = ({
                 key={key}
                 type="button"
                 onClick={() => onSelectRubro(key)}
-                className="tap-feedback group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/20 bg-slate-950 p-6 text-left shadow-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 min-h-[380px]"
+                className="tap-feedback group flex flex-col overflow-hidden rounded-[16px] text-left transition-transform duration-200 hover:-translate-y-1"
+                style={{
+                  backgroundColor: 'var(--card)',
+                  border: '1px solid var(--line)',
+                }}
               >
-                {/* Imagen de fondo con zoom suave en hover */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 z-0 overflow-hidden"
-                >
+                {/* Imagen superior limpia sin degradados ni texto encima ilegible */}
+                <div className="relative h-44 w-full overflow-hidden">
                   <img
                     src={item.heroImage}
                     alt={item.heroAlt}
                     referrerPolicy="no-referrer"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 filter brightness-90 group-hover:brightness-100"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  {/* Gradiente multicapa profesional */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/30" />
                   <div
-                    className="absolute inset-0 opacity-30 mix-blend-overlay"
-                    style={{ backgroundColor: item.colores.primario }}
-                  />
-                </div>
-
-                {/* Contenido superior de la tarjeta */}
-                <div className="relative z-10 flex items-start justify-between">
-                  <div
-                    className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg backdrop-blur-md"
+                    className="absolute top-3 left-3 flex h-10 w-10 items-center justify-center rounded-[12px]"
                     style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.18)',
-                      color: '#FFFFFF',
+                      backgroundColor: 'var(--card)',
+                      border: '1px solid var(--line)',
+                      color: 'var(--p)',
                     }}
                   >
-                    <RubroSvgIcon rubro={key} className="h-7 w-7" />
+                    <RubroSvgIcon rubro={key} className="h-5 w-5" />
                   </div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600/90 px-3.5 py-1 text-xs font-bold text-white shadow-md backdrop-blur-md border border-emerald-400/30">
-                    <MessageSquare className="h-3.5 w-3.5" /> WhatsApp Pro
+                  <span
+                    className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-[10px] px-2.5 py-1 text-[12px] font-medium"
+                    style={{
+                      backgroundColor: 'var(--cys)',
+                      color: 'var(--cyt)',
+                      border: '1px solid var(--line)',
+                    }}
+                  >
+                    <Smartphone className="h-3.5 w-3.5" aria-hidden="true" />
+                    App en vivo
                   </span>
                 </div>
 
-                {/* Contenido inferior de la tarjeta */}
-                <div className="relative z-10 mt-auto pt-10">
+                {/* Cuerpo comercial claro */}
+                <div className="flex flex-1 flex-col p-5">
                   <span
-                    className="inline-block text-xs font-bold tracking-wider uppercase mb-1 text-amber-300"
+                    className="text-[12px] font-medium uppercase tracking-wider"
+                    style={{ color: 'var(--cyt)' }}
                   >
                     {item.rubroLabel}
                   </span>
                   <h2
-                    className={`text-2xl font-extrabold text-white sm:text-3xl ${
-                      item.tipografia.esEditorialSerif
-                        ? 'font-display-serif text-3xl'
-                        : ''
-                    }`}
+                    className="font-outfit mt-1 text-[22px] leading-tight"
+                    style={{ color: 'var(--ink)' }}
                   >
                     {item.nombre}
                   </h2>
-                  <p className="mt-2 text-xs leading-relaxed text-slate-200">
-                    {item.resumenSelector} · {item.servicios.length} servicios listos
+                  <p
+                    className="mt-1.5 mb-4 text-[14px] leading-[1.5]"
+                    style={{ color: 'var(--sub)' }}
+                  >
+                    {RUBRO_SOLUTIONS[key]}
                   </p>
 
-                  <div className="mt-5 flex items-center justify-between border-t border-white/20 pt-4">
-                    <span className="text-xs font-bold text-white underline underline-offset-4">
-                      Ver demo interactiva
+                  <div
+                    className="mt-auto flex items-center justify-between pt-4"
+                    style={{ borderTop: '1px solid var(--line)' }}
+                  >
+                    <span
+                      className="text-[14px] font-semibold"
+                      style={{ color: 'var(--p)' }}
+                    >
+                      {session.role === 'owner'
+                        ? 'Abrir Panel Dueño'
+                        : 'Abrir App de Citas'}
                     </span>
                     <span
-                      className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-lg transition-transform duration-300 group-hover:translate-x-1"
-                      style={{ backgroundColor: item.colores.primario }}
+                      className="flex h-9 w-9 items-center justify-center rounded-[10px] transition-transform duration-200 group-hover:translate-x-0.5"
+                      style={{
+                        backgroundColor: 'var(--p)',
+                        color: 'var(--onp)',
+                      }}
                     >
-                      <ArrowRight className="h-5 w-5" />
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </span>
                   </div>
                 </div>
@@ -279,34 +430,35 @@ export const RubroSelector: React.FC<RubroSelectorProps> = ({
             );
           })}
         </section>
-
-        {/* Banner de instalación PWA */}
-        <div className="mx-auto mt-12 w-full max-w-xl">
-          <PWAInstallBanner accentColor="#4F46E5" isDark={isDark} />
-        </div>
       </main>
 
-      {/* Pie animado inspirador */}
       <footer
-        className={`relative z-10 border-t py-6 text-center text-xs backdrop-blur-md transition-colors duration-300 ${
-          isDark
-            ? 'border-white/10 bg-slate-950/80 text-slate-400'
-            : 'border-slate-200 bg-white/80 text-slate-600'
-        }`}
+        className="py-5 text-center text-[13px]"
+        style={{
+          backgroundColor: 'var(--card)',
+          borderTop: '1px solid var(--line)',
+          color: 'var(--sub)',
+        }}
       >
-        <div className="mx-auto max-w-6xl px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="flex items-center gap-1.5">
-            <Calendar className="h-4 w-4 text-indigo-500" />
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 sm:flex-row sm:px-6">
+          <div className="flex items-center gap-2">
+            <MariaLogoMark className="h-6 w-6 shrink-0" />
             <span>
-              Sistema de reservas inteligente impulsado por{' '}
-              <strong className={isDark ? 'text-white' : 'text-slate-900'}>
-                MarIA
-              </strong>
+              Impulsado por{' '}
+              <strong style={{ color: 'var(--ink)' }}>MarIA Citas</strong>
             </span>
-          </p>
-          <p className={isDark ? 'text-slate-500' : 'text-slate-500'}>
-            Desarrollado con pasión en Huancayo, Perú 🇵🇪
-          </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={handleDownloadLogo}
+              className="font-medium underline underline-offset-4"
+              style={{ color: 'var(--p)' }}
+            >
+              Descargar Logo PNG
+            </button>
+            <p>Desarrollado con pasión, Perú 🇵🇪.</p>
+          </div>
         </div>
       </footer>
     </div>

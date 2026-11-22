@@ -5,12 +5,20 @@ import { RubroSvgIcon } from './RubroIcons';
 
 interface BusinessLandingProps {
   rubro: RubroConfig;
+  userRole: 'guest' | 'client' | 'owner';
+  userName?: string;
   onStartBooking: (preselectedService?: ServicioItem) => void;
+  onOpenInstallModal: () => void;
+  onOpenAuthSheet: (mode?: 'register' | 'login' | 'owner') => void;
 }
 
 export const BusinessLanding: React.FC<BusinessLandingProps> = ({
   rubro,
+  userRole,
+  userName,
   onStartBooking,
+  onOpenInstallModal,
+  onOpenAuthSheet,
 }) => {
   const [imgFailed, setImgFailed] = useState(false);
 
@@ -24,7 +32,7 @@ export const BusinessLanding: React.FC<BusinessLandingProps> = ({
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 lg:items-stretch">
           {/* Imagen principal 16:9 con fallback resistente */}
-          <div className="relative aspect-video w-full overflow-hidden bg-slate-100 lg:col-span-6 lg:aspect-auto lg:min-h-[300px]">
+          <div className="relative aspect-video w-full overflow-hidden bg-slate-100 lg:col-span-6 lg:aspect-auto lg:min-h-[320px]">
             {!imgFailed ? (
               <img
                 src={rubro.heroImage}
@@ -47,7 +55,7 @@ export const BusinessLanding: React.FC<BusinessLandingProps> = ({
             )}
           </div>
 
-          {/* Propuesta de valor + Botón Reservar */}
+          {/* Propuesta de valor + Botón Sacar Cita + Descargar App */}
           <div className="flex flex-col justify-between p-5 sm:p-7 lg:col-span-6">
             <div>
               <p
@@ -55,6 +63,7 @@ export const BusinessLanding: React.FC<BusinessLandingProps> = ({
                 style={{ color: rubro.colores.primario }}
               >
                 {rubro.rubroLabel} · {rubro.ciudad}
+                {userRole === 'client' && userName ? ` · Hola, ${userName}` : ''}
               </p>
 
               <h1
@@ -91,7 +100,7 @@ export const BusinessLanding: React.FC<BusinessLandingProps> = ({
               </div>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-5 space-y-2.5">
               <button
                 type="button"
                 onClick={() => onStartBooking()}
@@ -101,6 +110,33 @@ export const BusinessLanding: React.FC<BusinessLandingProps> = ({
                 <CalendarPlus className="h-5 w-5" aria-hidden="true" />
                 {rubro.landing.ctaPrincipal}
               </button>
+
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={onOpenInstallModal}
+                  className="tap-feedback flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-800 hover:bg-slate-100 whitespace-nowrap"
+                >
+                  Descargar App al móvil
+                </button>
+                {userRole === 'guest' ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenAuthSheet('register')}
+                    className="tap-feedback flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-800 hover:bg-slate-50 whitespace-nowrap"
+                  >
+                    Registrarme con teléfono
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onOpenAuthSheet('login')}
+                    className="tap-feedback flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-800 hover:bg-slate-50 whitespace-nowrap"
+                  >
+                    Cambiar cuenta / rol
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

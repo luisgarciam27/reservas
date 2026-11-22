@@ -46,7 +46,7 @@ export const ClientsTab: React.FC<ClientsTabProps> = ({ rubro, citas }) => {
 
   const handleWhatsAppChat = (telefono: string, nombre: string) => {
     const cleanPhone = telefono.replace(/\D/g, '');
-    const msg = `Hola ${nombre}, te escribimos de ${rubro.nombre} en Huancayo para saludarte y coordinar tu próxima atención.`;
+    const msg = `Hola ${nombre}, te escribimos de ${rubro.nombre} para saludarte y coordinar tu próxima atención.`;
     window.open(`https://wa.me/51${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 

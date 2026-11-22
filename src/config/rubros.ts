@@ -21,6 +21,8 @@ export const SUPABASE_URL: string =
 export const SUPABASE_ANON_KEY: string =
   import.meta.env.VITE_SUPABASE_ANON_KEY || 'tu-anon-key-publica-aqui';
 
+import type { ModuloId, Negocio, RubroSaasKey, ServicioSaaS } from '../types/saas';
+
 export type RubroKey = 'consultorio' | 'salon' | 'veterinaria';
 
 export type EstadoCita =
@@ -66,6 +68,17 @@ export interface CitaEjemplo {
   notaMascota?: string;
 }
 
+export interface PromocionItem {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  descuentoBadge: string;
+  precioPromo: number;
+  precioRegular: number;
+  servicioId: string;
+  vigencia: string;
+}
+
 export interface RubroConfig {
   id: RubroKey;
   rubroLabel: string;
@@ -106,6 +119,7 @@ export interface RubroConfig {
     esEditorialSerif: boolean;
   };
   servicios: ServicioItem[];
+  promos: PromocionItem[];
   camposExtra: CampoExtra[];
   recordatorio: {
     ejemploCliente: string;
@@ -133,13 +147,13 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
     id: 'consultorio',
     rubroLabel: 'Consultorio / Dentista',
     resumenSelector: 'Odontología, medicina y clínicas',
-    nombre: 'Clínica Dental Sonrisa Andina',
-    ciudad: 'Huancayo',
-    direccion: 'Av. Giráldez 428, Huancayo',
+    nombre: 'Clínica Dental Sonrisa',
+    ciudad: 'Lima',
+    direccion: 'Av. Principal 428',
     eslogan: 'Atención odontológica puntual y sin esperas',
     logoEmoji: '🦷',
     heroImage: heroConsultorioImg,
-    heroAlt: 'Consultorio odontológico moderno y luminoso en Huancayo',
+    heroAlt: 'Consultorio odontológico moderno y luminoso',
     negocio_id: '11111111-1111-4111-8111-111111111101',
     whatsapp: '51964112233',
     horario: {
@@ -240,6 +254,28 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         recomendacion: 'Sugerimos realizar una limpieza previa si hay sarro.',
       },
     ],
+    promos: [
+      {
+        id: 'promo-sonrisa',
+        titulo: 'Pack Blanqueamiento + Limpieza',
+        descripcion: 'Elimina manchas y luce una sonrisa 3 tonos más blanca con blanqueamiento LED y profilaxis completa.',
+        descuentoBadge: '30% OFF',
+        precioPromo: 220,
+        precioRegular: 320,
+        servicioId: 'blanqueamiento',
+        vigencia: 'Fin de semana',
+      },
+      {
+        id: 'promo-prev',
+        titulo: 'Chequeo Preventivo Familiar',
+        descripcion: 'Evaluación y diagnóstico odontológico con odontograma digital para toda la familia.',
+        descuentoBadge: 'S/ 30 OFF',
+        precioPromo: 20,
+        precioRegular: 50,
+        servicioId: 'consulta-diagnostico',
+        vigencia: 'Este mes',
+      },
+    ],
     camposExtra: [
       {
         name: 'motivo',
@@ -328,12 +364,12 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
     rubroLabel: 'Salón y Spa',
     resumenSelector: 'Estilismo, manicure, faciales y spa',
     nombre: 'Atelier Rosa & Oro Spa',
-    ciudad: 'Huancayo',
-    direccion: 'Calle Real 615, Int. 204, Huancayo',
+    ciudad: 'Lima',
+    direccion: 'Av. Los Rosales 615, Int. 204',
     eslogan: 'Rituales de belleza, cabello y bienestar',
     logoEmoji: '✨',
     heroImage: heroSalonImg,
-    heroAlt: 'Interior elegante de Atelier Rosa & Oro Spa en Huancayo',
+    heroAlt: 'Interior elegante de Atelier Rosa & Oro Spa',
     negocio_id: '22222222-2222-4222-8222-222222222202',
     whatsapp: '51964112233',
     horario: {
@@ -434,6 +470,28 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         recomendacion: 'Apta para todo tipo de piel, incluso sensible.',
       },
     ],
+    promos: [
+      {
+        id: 'promo-brillo',
+        titulo: 'Pack Brillo & Hidratación Capilar',
+        descripcion: 'Corte estilizado + Hidratación profunda con ampolla botox capilar y brushing profesional.',
+        descuentoBadge: '25% OFF',
+        precioPromo: 95,
+        precioRegular: 130,
+        servicioId: 'hidratacion-keratina',
+        vigencia: 'Viernes y Sábados',
+      },
+      {
+        id: 'promo-manos',
+        titulo: 'Combo Manicure Gel + Pedicure Spa',
+        descripcion: 'Esmaltado en gel duradero con exfoliación e hidratación profunda.',
+        descuentoBadge: 'S/ 25 OFF',
+        precioPromo: 75,
+        precioRegular: 100,
+        servicioId: 'manicure-gel',
+        vigencia: 'Martes a Jueves',
+      },
+    ],
     camposExtra: [], // Salón no requiere campos extra
     recordatorio: {
       ejemploCliente: 'Valeria Chávez',
@@ -493,9 +551,9 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
     id: 'veterinaria',
     rubroLabel: 'Veterinaria',
     resumenSelector: 'Consultas, vacunas, baño y grooming',
-    nombre: 'Veterinaria Patitas del Valle',
-    ciudad: 'Huancayo',
-    direccion: 'Jr. Puno 312, Huancayo',
+    nombre: 'Veterinaria Patitas',
+    ciudad: 'Lima',
+    direccion: 'Jr. Central 312',
     eslogan: 'Cuidado cálido y profesional para tu mejor amigo',
     logoEmoji: '🐾',
     heroImage: heroVeterinariaImg,
@@ -600,6 +658,28 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         recomendacion: 'Se sugiere ayuno ligero de 6 horas si es evaluación abdominal.',
       },
     ],
+    promos: [
+      {
+        id: 'promo-pet-salud',
+        titulo: 'Pack Bienestar: Baño + Vacuna',
+        descripcion: 'Mantén a tu engreído protegido contra parásitos externos y al día con su cartilla de vacunación.',
+        descuentoBadge: '20% OFF',
+        precioPromo: 90,
+        precioRegular: 115,
+        servicioId: 'bano-grooming',
+        vigencia: 'Todo este mes',
+      },
+      {
+        id: 'promo-eco',
+        titulo: 'Chequeo Geriátrico con Ecografía',
+        descripcion: 'Evaluación preventiva recomendada para perritos y gatitos mayores de 7 años.',
+        descuentoBadge: 'S/ 30 OFF',
+        precioPromo: 135,
+        precioRegular: 165,
+        servicioId: 'ecografia-control',
+        vigencia: 'Miércoles especiales',
+      },
+    ],
     camposExtra: [
       {
         name: 'nombreMascota',
@@ -683,3 +763,313 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
     ],
   },
 };
+
+// ============================================================================
+// CONFIGURACIÓN UNIFICADA POR RUBRO PARA EL MINI SAAS ("MarIA Citas")
+// ============================================================================
+export interface RubroSaasPreset {
+  id: RubroSaasKey;
+  rubroLabel: string;
+  descripcionCorta: string;
+  logoDefault: string;
+  colorDefault: string;
+  sujetoLabel: 'mascota' | 'paciente' | 'cliente';
+  sujetoPlural: 'mascotas' | 'pacientes' | 'clientes';
+  sujetoSingularCap: string;
+  sujetoPluralCap: string;
+  extraCrmLabel: string;
+  modulosRecomendados: ModuloId[];
+  camposExtra: CampoExtra[];
+  serviciosEjemplo: Omit<ServicioItem, 'incluye' | 'recomendacion'>[];
+  profesionalesEjemplo: { nombre: string; especialidad: string }[];
+  productosEjemplo: { nombre: string; precio: number; descripcion: string; stock: number }[];
+}
+
+export const RUBRO_SAAS_ORDER: RubroSaasKey[] = [
+  'veterinaria',
+  'consultorio',
+  'salon',
+  'otro',
+];
+
+export const RUBROS_SAAS: Record<RubroSaasKey, RubroSaasPreset> = {
+  veterinaria: {
+    id: 'veterinaria',
+    rubroLabel: 'Veterinaria',
+    descripcionCorta: 'Consultas, vacunas, baño medicado y fichas de mascotas',
+    logoDefault: '🐾',
+    colorDefault: '#15803D',
+    sujetoLabel: 'mascota',
+    sujetoPlural: 'mascotas',
+    sujetoSingularCap: 'Mascota',
+    sujetoPluralCap: 'Mascotas',
+    extraCrmLabel: 'Mascotas y observaciones',
+    modulosRecomendados: [
+      'agenda',
+      'servicios',
+      'recordatorios',
+      'clientes',
+      'promos',
+      'catalogo',
+      'reportes',
+    ],
+    camposExtra: RUBROS.veterinaria.camposExtra,
+    serviciosEjemplo: RUBROS.veterinaria.servicios.map((s) => ({
+      id: s.id,
+      nombre: s.nombre,
+      duracion: s.duracion,
+      precio: s.precio,
+      descripcion: s.descripcion,
+    })),
+    profesionalesEjemplo: [
+      { nombre: 'Dra. Camila Rojas', especialidad: 'Medicina Veterinaria' },
+      { nombre: 'Tec. Piero Salazar', especialidad: 'Grooming y Baño' },
+    ],
+    productosEjemplo: [
+      {
+        nombre: 'Antipulgas Simparica (10-20 kg)',
+        precio: 68,
+        descripcion: 'Protección mensual contra pulgas y garrapatas.',
+        stock: 15,
+      },
+      {
+        nombre: 'Shampoo Hipoalergénico Avena 350ml',
+        precio: 42,
+        descripcion: 'Ideal para piel sensible y pelaje brillante.',
+        stock: 20,
+      },
+      {
+        nombre: 'Snacks Dentales Perro Adulto',
+        precio: 24,
+        descripcion: 'Bolsa x 7 unidades para higiene bucal diaria.',
+        stock: 30,
+      },
+    ],
+  },
+
+  consultorio: {
+    id: 'consultorio',
+    rubroLabel: 'Consultorio / Clínica',
+    descripcionCorta: 'Odontología, medicina general, psicología y especialidades',
+    logoDefault: '🦷',
+    colorDefault: '#0369A1',
+    sujetoLabel: 'paciente',
+    sujetoPlural: 'pacientes',
+    sujetoSingularCap: 'Paciente',
+    sujetoPluralCap: 'Pacientes',
+    extraCrmLabel: 'Motivos de consulta',
+    modulosRecomendados: [
+      'agenda',
+      'servicios',
+      'recordatorios',
+      'clientes',
+      'reportes',
+    ],
+    camposExtra: RUBROS.consultorio.camposExtra,
+    serviciosEjemplo: RUBROS.consultorio.servicios.map((s) => ({
+      id: s.id,
+      nombre: s.nombre,
+      duracion: s.duracion,
+      precio: s.precio,
+      descripcion: s.descripcion,
+    })),
+    profesionalesEjemplo: [
+      { nombre: 'Dr. Ricardo Mendoza', especialidad: 'Odontología General' },
+      { nombre: 'Dra. Lucía Paredes', especialidad: 'Ortodoncia y Estética' },
+    ],
+    productosEjemplo: [
+      {
+        nombre: 'Cepillo Interdental + Hilo Encerado',
+        precio: 22,
+        descripcion: 'Kit de higiene recomendado post-profilaxis.',
+        stock: 25,
+      },
+      {
+        nombre: 'Enjuague Bucal Terapéutico 500ml',
+        precio: 38,
+        descripcion: 'Fórmula sin alcohol para encías sensibles.',
+        stock: 18,
+      },
+    ],
+  },
+
+  salon: {
+    id: 'salon',
+    rubroLabel: 'Spa / Salón de Belleza',
+    descripcionCorta: 'Estilismo, manicure gel, keratina, faciales y masajes',
+    logoDefault: '✨',
+    colorDefault: '#9D4E65',
+    sujetoLabel: 'cliente',
+    sujetoPlural: 'clientes',
+    sujetoSingularCap: 'Cliente',
+    sujetoPluralCap: 'Clientes',
+    extraCrmLabel: 'Preferencias del cliente',
+    modulosRecomendados: [
+      'agenda',
+      'servicios',
+      'recordatorios',
+      'clientes',
+      'promos',
+      'catalogo',
+    ],
+    camposExtra: [
+      {
+        name: 'preferencia',
+        label: 'Preferencia o nota (opcional)',
+        placeholder: 'Ej. Tono de esmalte, largo de corte o alergia',
+        required: false,
+        type: 'text',
+      },
+    ],
+    serviciosEjemplo: RUBROS.salon.servicios.map((s) => ({
+      id: s.id,
+      nombre: s.nombre,
+      duracion: s.duracion,
+      precio: s.precio,
+      descripcion: s.descripcion,
+    })),
+    profesionalesEjemplo: [
+      { nombre: 'Est. Valeria Chávez', especialidad: 'Colorimetría y Corte' },
+      { nombre: 'Esp. Fiorella Gamarra', especialidad: 'Manicure Spa & Gel' },
+    ],
+    productosEjemplo: [
+      {
+        nombre: 'Sérum Reparador Argán 100ml',
+        precio: 55,
+        descripcion: 'Sellador de puntas y protector térmico.',
+        stock: 14,
+      },
+      {
+        nombre: 'Mascarilla Capilar Sin Sal 500g',
+        precio: 65,
+        descripcion: 'Prolonga el efecto de tu keratina o botox capilar.',
+        stock: 12,
+      },
+    ],
+  },
+
+  otro: {
+    id: 'otro',
+    rubroLabel: 'Otro Negocio de Citas',
+    descripcionCorta: 'Barbería, fisioterapia, asesorías, fotografía o taller',
+    logoDefault: '📅',
+    colorDefault: '#4F46E5',
+    sujetoLabel: 'cliente',
+    sujetoPlural: 'clientes',
+    sujetoSingularCap: 'Cliente',
+    sujetoPluralCap: 'Clientes',
+    extraCrmLabel: 'Notas de atención',
+    modulosRecomendados: [
+      'agenda',
+      'servicios',
+      'recordatorios',
+      'clientes',
+      'promos',
+    ],
+    camposExtra: [
+      {
+        name: 'motivo',
+        label: 'Detalle o requerimiento (opcional)',
+        placeholder: 'Ej. Primera sesión, consulta específica',
+        required: false,
+        type: 'text',
+      },
+    ],
+    serviciosEjemplo: [
+      {
+        id: 'sesion-inicial',
+        nombre: 'Sesión / Atención Estándar',
+        duracion: '45 min',
+        precio: 60,
+        descripcion: 'Atención personalizada con diagnóstico o evaluación inicial.',
+      },
+      {
+        id: 'paquete-completo',
+        nombre: 'Servicio Completo Premium',
+        duracion: '60 min',
+        precio: 110,
+        descripcion: 'Sesión extendida con seguimiento por WhatsApp.',
+      },
+      {
+        id: 'control-seguimiento',
+        nombre: 'Control o Seguimiento',
+        duracion: '30 min',
+        precio: 40,
+        descripcion: 'Cita rápida de revisión o mantenimiento.',
+      },
+    ],
+    profesionalesEjemplo: [
+      { nombre: 'Especialista Principal', especialidad: 'Atención General' },
+    ],
+    productosEjemplo: [
+      {
+        nombre: 'Kit de Cuidado Recomendado',
+        precio: 45,
+        descripcion: 'Complemento sugerido para mantener resultados en casa.',
+        stock: 10,
+      },
+    ],
+  },
+};
+
+function sanitizeColorHex(hex: string | undefined, fallback: string): string {
+  if (!hex) return fallback;
+  return /^#[0-9a-fA-F]{6}$/.test(hex.trim()) ? hex.trim() : fallback;
+}
+
+/**
+ * Adapta cualquier Negocio SaaS + sus servicios reales a la interfaz RubroConfig
+ * para reutilizar todos los componentes existentes del dueño y reservas sin duplicar pantallas.
+ */
+export function buildRubroConfigFromNegocio(
+  negocio: Negocio,
+  servicios: ServicioSaaS[]
+): RubroConfig {
+  const preset = RUBROS_SAAS[negocio.rubro] || RUBROS_SAAS.otro;
+  const demoBase: RubroConfig =
+    negocio.rubro === 'otro' ? RUBROS.consultorio : RUBROS[negocio.rubro];
+  const colorPrimario = sanitizeColorHex(negocio.color, preset.colorDefault);
+  const cleanWa = negocio.whatsapp.replace(/\D/g, '') || '51964112233';
+
+  return {
+    ...demoBase,
+    id: negocio.rubro === 'otro' ? 'consultorio' : negocio.rubro,
+    rubroLabel: preset.rubroLabel,
+    resumenSelector: preset.descripcionCorta,
+    nombre: negocio.nombre,
+    ciudad: 'Perú',
+    direccion: negocio.direccion || 'Dirección por confirmar',
+    eslogan: `Reserva tu cita en ${negocio.nombre}`,
+    logoEmoji: negocio.logo || preset.logoDefault,
+    negocio_id: negocio.id,
+    whatsapp: cleanWa.startsWith('51') ? cleanWa : `51${cleanWa}`,
+    horario: {
+      diasLabel: negocio.horario || 'Lunes a Sábado · 9:00 a 19:00',
+      horaInicio: 9,
+      horaFin: 19,
+    },
+    colores: {
+      ...demoBase.colores,
+      primario: colorPrimario,
+      primarioHover: colorPrimario,
+      acento: colorPrimario,
+      chipActivoBg: colorPrimario,
+      themeColorMeta: colorPrimario,
+      fondoSuave: '#F8FAFC',
+      bordeSuave: '#E2E8F0',
+      superficieDestacada: `${colorPrimario}1A`,
+    },
+    servicios: servicios.map((s) => ({
+      id: s.id,
+      nombre: s.nombre,
+      duracion: s.duracion,
+      precio: Number(s.precio) || 0,
+      descripcion: s.descripcion || 'Atención programada con confirmación por WhatsApp.',
+      incluye: [],
+      recomendacion: '',
+    })),
+    camposExtra: preset.camposExtra,
+    citasEjemplo: [],
+  };
+}
+

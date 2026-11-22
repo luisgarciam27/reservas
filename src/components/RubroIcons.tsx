@@ -11,26 +11,57 @@ export const MariaLogoMark: React.FC<{ className?: string }> = ({
     className={className}
     aria-hidden="true"
   >
-    {/* Cohete MarIA exacto inspirado en la imagen */}
-    <path
-      d="M32 8C25 8 21 16 21 27V42C21 45.3137 23.6863 48 27 48H37C40.3137 48 43 45.3137 43 42V27C43 16 39 8 32 8Z"
-      fill="#7C3AED"
+    {/* Fondo suave de marca */}
+    <rect
+      x="2"
+      y="2"
+      width="60"
+      height="60"
+      rx="16"
+      style={{ fill: 'var(--ps, #EDE9FE)' }}
     />
+    {/* Anillas superiores del calendario */}
     <path
-      d="M32 8C25 8 21 16 21 27H43C43 16 39 8 32 8Z"
-      fill="#F43F5E"
+      d="M22 14V20M42 14V20"
+      stroke="currentColor"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+      style={{ color: 'var(--p, #5B21B6)' }}
     />
-    <circle cx="32" cy="27" r="7" fill="#10B981" />
-    <circle cx="32" cy="27" r="3" fill="#0F172A" />
-    <path d="M21 34L14 40V44L21 41V34Z" fill="#7C3AED" />
-    <path d="M43 34L50 40V44L43 41V34Z" fill="#7C3AED" />
-    <rect x="26" y="48" width="4" height="6" rx="2" fill="#7C3AED" />
-    <rect x="34" y="48" width="4" height="6" rx="2" fill="#7C3AED" />
+    {/* Cuerpo del calendario */}
+    <rect
+      x="14"
+      y="18"
+      width="36"
+      height="32"
+      rx="8"
+      stroke="currentColor"
+      strokeWidth="3.2"
+      style={{ color: 'var(--p, #5B21B6)', fill: 'var(--card, #FFFFFF)' }}
+    />
+    {/* Cabecera del calendario */}
+    <path
+      d="M15 27H49"
+      stroke="currentColor"
+      strokeWidth="3"
+      style={{ color: 'var(--p, #5B21B6)' }}
+    />
+    {/* Destello de IA en cian */}
+    <path
+      d="M32 31.5L34.1 37.4L40 39.5L34.1 41.6L32 47.5L29.9 41.6L24 39.5L29.9 37.4L32 31.5Z"
+      style={{ fill: 'var(--cy, #0891B2)' }}
+    />
+    <circle
+      cx="41.5"
+      cy="33.5"
+      r="2"
+      style={{ fill: 'var(--p, #5B21B6)' }}
+    />
   </svg>
 );
 
 export const RubroSvgIcon: React.FC<{
-  rubro: RubroKey;
+  rubro: RubroKey | 'otro';
   className?: string;
 }> = ({ rubro, className = 'w-7 h-7' }) => {
   if (rubro === 'consultorio') {
@@ -65,6 +96,24 @@ export const RubroSvgIcon: React.FC<{
         <path d="M12 3c2.4 2.8 3.6 5.4 3.6 8a3.6 3.6 0 1 1-7.2 0c0-2.6 1.2-5.2 3.6-8Z" />
         <path d="M5.5 10.5c2.2.4 4.1 1.6 5.3 3.4a4.2 4.2 0 0 1-5.8 5.6 4.2 4.2 0 0 1 .5-9Z" />
         <path d="M18.5 10.5c-2.2.4-4.1 1.6-5.3 3.4a4.2 4.2 0 0 0 5.8 5.6 4.2 4.2 0 0 0-.5-9Z" />
+      </svg>
+    );
+  }
+
+  if (rubro === 'otro') {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        aria-hidden="true"
+      >
+        <rect x="3" y="4" width="18" height="17" rx="3" />
+        <path d="M8 2v4M16 2v4M3 10h18M9 15l2 2 4-4" />
       </svg>
     );
   }
