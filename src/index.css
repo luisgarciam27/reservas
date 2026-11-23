@@ -75,6 +75,70 @@
   }
 }
 
+/* ==========================================================================
+   TIPOGRAFÍA Y LEGIBILIDAD ADAPTADA PARA MÓVIL (< 640px)
+   Aumenta el tamaño base de la letra para lectura cómoda en pantallas móviles
+   sin romper tarjetas ni desbordar botones.
+   ========================================================================== */
+@media (max-width: 640px) {
+  html {
+    /* Aumenta el rem base de 16px a 17.5px para dar mayor presencia y legibilidad */
+    font-size: 17.5px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Previene micro-textos ilegibles en celulares */
+  .text-\[10px\] {
+    font-size: 0.74rem !important; /* ~13px */
+    line-height: 1.15rem !important;
+  }
+
+  .text-\[11px\] {
+    font-size: 0.8rem !important; /* ~14px */
+    line-height: 1.25rem !important;
+  }
+
+  .text-\[12px\] {
+    font-size: 0.85rem !important; /* ~14.9px */
+    line-height: 1.3rem !important;
+  }
+
+  .text-\[13px\] {
+    font-size: 0.9rem !important; /* ~15.75px */
+    line-height: 1.35rem !important;
+  }
+
+  .text-xs {
+    font-size: 0.85rem !important; /* ~14.9px */
+    line-height: 1.35rem !important;
+  }
+
+  .text-sm {
+    font-size: 0.96rem !important; /* ~16.8px */
+    line-height: 1.45rem !important;
+  }
+
+  .text-base {
+    font-size: 1.05rem !important; /* ~18.4px */
+    line-height: 1.55rem !important;
+  }
+
+  /* Inputs, selects y áreas de texto con tamaño accesible */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+    line-height: 1.4rem !important;
+  }
+
+  /* Botones táctiles cómodos de pulsar y con texto claro */
+  button,
+  a {
+    letter-spacing: -0.01em;
+  }
+}
+
 .font-display-serif {
   font-family: var(--font-serif);
 }

@@ -303,10 +303,10 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
               )}
             </span>
             <div className="min-w-0">
-              <h1 className="truncate text-sm font-extrabold text-slate-900 sm:text-base">
+              <h1 className="truncate text-base font-extrabold text-slate-900 sm:text-lg">
                 {negocio.nombre}
               </h1>
-              <p className="truncate text-[11px] font-medium text-slate-500">
+              <p className="truncate text-xs font-semibold text-slate-500">
                 {negocio.horario}
               </p>
             </div>
@@ -319,9 +319,9 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
               backgroundColor: `${negocio.color}14`,
               color: negocio.color,
             }}
-            className="tap-feedback inline-flex min-h-[38px] shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-bold"
+            className="tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl px-3.5 text-xs sm:text-sm font-bold"
           >
-            <Download className="h-3.5 w-3.5" />
+            <Download className="h-4 w-4" />
             <span className="hidden sm:inline">Instalar App</span>
           </button>
         </div>
@@ -534,7 +534,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
           /* FLUJO PASO A PASO */
           <div className="space-y-4">
             {/* Indicador visual del flujo */}
-            <div className="grid grid-cols-4 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 text-[11px] font-bold">
+            <div className="grid grid-cols-4 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 text-xs font-bold">
               {[
                 { n: 1, t: '1. Servicio' },
                 { n: 2, t: '2. Especialista' },
@@ -548,7 +548,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                       ? { backgroundColor: negocio.color, color: '#FFFFFF' }
                       : undefined
                   }
-                  className={`flex min-h-[36px] items-center justify-center rounded-xl px-1 text-center ${
+                  className={`flex min-h-[38px] items-center justify-center rounded-xl px-1 text-center ${
                     step === st.n ? '' : 'text-slate-400'
                   }`}
                 >
@@ -573,27 +573,27 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h3 className="text-sm font-bold text-slate-900">
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900">
                             {svc.nombre}
                           </h3>
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs sm:text-sm text-slate-500">
                             {svc.descripcion || 'Atención programada'}
                           </p>
                         </div>
                         <span
-                          className="shrink-0 text-sm font-extrabold tabular-nums"
+                          className="shrink-0 text-base sm:text-lg font-black tabular-nums"
                           style={{ color: negocio.color }}
                         >
                           S/ {svc.precio}
                         </span>
                       </div>
-                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 text-xs">
-                        <span className="inline-flex items-center gap-1 text-slate-500">
-                          <Clock className="h-3.5 w-3.5" />
+                      <div className="mt-3.5 flex items-center justify-between border-t border-slate-100 pt-2.5 text-xs sm:text-sm">
+                        <span className="inline-flex items-center gap-1.5 text-slate-500 font-medium">
+                          <Clock className="h-4 w-4" />
                           {svc.duracion}
                         </span>
                         <span
-                          className="font-bold"
+                          className="font-bold text-sm"
                           style={{ color: negocio.color }}
                         >
                           Elegir →
@@ -766,7 +766,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                                   }
                                 : undefined
                             }
-                            className={`min-h-[46px] rounded-xl border text-xs font-bold tabular-nums ${
+                            className={`min-h-[46px] rounded-xl border text-sm font-bold tabular-nums ${
                               occupied
                                 ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 line-through'
                                 : 'border-slate-200 bg-white text-slate-900 hover:border-slate-400'
@@ -785,7 +785,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                   disabled={!hora}
                   onClick={() => setStep(4)}
                   style={hora ? { backgroundColor: negocio.color } : undefined}
-                  className="min-h-[50px] w-full rounded-xl bg-slate-900 text-sm font-bold text-white disabled:bg-slate-200 disabled:text-slate-400"
+                  className="min-h-[52px] w-full rounded-xl bg-slate-900 text-base font-bold text-white disabled:bg-slate-200 disabled:text-slate-400 shadow-2xs"
                 >
                   Continuar con tus datos
                 </button>
@@ -796,28 +796,28 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
             {step === 4 && selectedService && (
               <form
                 onSubmit={handleConfirmBooking}
-                className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5"
+                className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 sm:p-6"
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div>
-                    <p className="text-sm font-bold text-slate-900">
+                    <p className="text-base font-bold text-slate-900">
                       {selectedService.nombre}
                     </p>
-                    <p className="text-xs text-slate-500 tabular-nums">
+                    <p className="text-xs sm:text-sm text-slate-500 tabular-nums">
                       {fecha} · {hora} · S/ {selectedService.precio}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setStep(3)}
-                    className="text-xs font-bold text-slate-600"
+                    className="text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900"
                   >
                     Cambiar hora
                   </button>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label className="block text-xs sm:text-sm font-bold text-slate-800">
                     Tu nombre completo
                   </label>
                   <input
@@ -826,13 +826,13 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                     placeholder="Ej. Valeria Chávez"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
-                    className="mt-1 min-h-[46px] w-full rounded-xl border border-slate-300 px-3 text-sm"
+                    className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3.5 text-base"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
                       Celular WhatsApp (9 dígitos)
                     </label>
                     <input
@@ -847,18 +847,18 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                           e.target.value.replace(/\D/g, '').slice(0, 9)
                         )
                       }
-                      className="mt-1 min-h-[46px] w-full rounded-xl border border-slate-300 px-3 text-sm tabular-nums"
+                      className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3.5 text-base tabular-nums"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-700">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
                       Ciudad / Distrito
                     </label>
                     <input
                       type="text"
                       value={ciudad}
                       onChange={(e) => setCiudad(e.target.value)}
-                      className="mt-1 min-h-[46px] w-full rounded-xl border border-slate-300 px-3 text-sm"
+                      className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3.5 text-base"
                     />
                   </div>
                 </div>
@@ -866,7 +866,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                 {/* Campos dinámicos leídos desde config/rubros.ts */}
                 {preset.camposExtra.map((campo) => (
                   <div key={campo.name}>
-                    <label className="block text-xs font-bold text-slate-700">
+                    <label className="block text-xs sm:text-sm font-bold text-slate-800">
                       {campo.label}
                     </label>
                     {campo.type === 'select' && campo.options ? (
@@ -894,7 +894,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                                     }
                                   : undefined
                               }
-                              className="min-h-[44px] rounded-xl border border-slate-200 text-xs font-bold"
+                              className="min-h-[46px] rounded-xl border border-slate-200 text-xs sm:text-sm font-bold"
                             >
                               {opt}
                             </button>
@@ -913,14 +913,14 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                             [campo.name]: e.target.value,
                           }))
                         }
-                        className="mt-1 min-h-[46px] w-full rounded-xl border border-slate-300 px-3 text-sm"
+                        className="mt-1 min-h-[48px] w-full rounded-xl border border-slate-300 px-3.5 text-base"
                       />
                     )}
                   </div>
                 ))}
 
                 {errorMsg && (
-                  <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-bold text-rose-800">
+                  <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-rose-800">
                     {errorMsg}
                   </div>
                 )}
@@ -929,7 +929,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                   type="submit"
                   disabled={submitting}
                   style={{ backgroundColor: negocio.color }}
-                  className="tap-feedback flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl text-sm font-bold text-white shadow-sm disabled:opacity-60"
+                  className="tap-feedback flex min-h-[54px] w-full items-center justify-center gap-2 rounded-xl text-base font-bold text-white shadow-sm disabled:opacity-60"
                 >
                   <CheckCircle2 className="h-5 w-5" />
                   {submitting

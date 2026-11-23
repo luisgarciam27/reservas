@@ -363,20 +363,20 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
               {/* Header de Columna */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 px-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">{col.icon}</span>
-                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                  <span className="text-lg">{col.icon}</span>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-800">
                     {col.title}
                   </h3>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span
-                    className="rounded-full px-2 py-0.5 text-xs font-black tabular-nums"
+                    className="rounded-full px-2.5 py-0.5 text-xs font-black tabular-nums"
                     style={{ backgroundColor: col.badgeBg, color: col.badgeText }}
                   >
                     {colCitas.length}
                   </span>
                   {totalSoles > 0 && (
-                    <span className="text-[11px] font-bold text-slate-500 tabular-nums">
+                    <span className="text-xs font-bold text-slate-500 tabular-nums">
                       S/{totalSoles}
                     </span>
                   )}
@@ -403,7 +403,7 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
                         {/* Fecha y Hora + Pago Badge */}
                         <div className="flex items-center justify-between gap-1.5 text-xs">
                           <span
-                            className={`inline-flex items-center gap-1 font-bold rounded-lg px-2 py-0.5 tabular-nums text-[11px] ${
+                            className={`inline-flex items-center gap-1 font-bold rounded-lg px-2.5 py-1 tabular-nums text-xs ${
                               isToday
                                 ? 'bg-indigo-100 text-indigo-900 font-extrabold'
                                 : isTomorrow
@@ -413,21 +413,21 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
                                     : 'bg-emerald-50 text-emerald-800'
                             }`}
                           >
-                            <Clock className="h-3 w-3" />
+                            <Clock className="h-3.5 w-3.5" />
                             {isToday ? `Hoy ${cita.hora}` : `${cita.fecha} · ${cita.hora}`}
                           </span>
 
                           {/* Badge de Pago */}
                           {cita.pagoEstado === 'pagado' ? (
-                            <span className="rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 flex items-center gap-0.5">
-                              <Check className="h-2.5 w-2.5" /> Pagado
+                            <span className="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800 flex items-center gap-0.5">
+                              <Check className="h-3 w-3" /> Pagado
                             </span>
                           ) : cita.pagoEstado === 'adelanto' ? (
-                            <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800">
+                            <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
                               Adelanto S/{cita.montoPagado}
                             </span>
                           ) : (
-                            <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">
+                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
                               Por pagar
                             </span>
                           )}
@@ -435,10 +435,10 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
 
                         {/* Nombre del Cliente y Servicio */}
                         <div className="mt-2.5">
-                          <h4 className="font-extrabold text-slate-900 text-xs">
+                          <h4 className="font-extrabold text-slate-900 text-sm sm:text-base">
                             {cita.cliente}
                           </h4>
-                          <div className="flex items-center justify-between mt-0.5 text-xs">
+                          <div className="flex items-center justify-between mt-1 text-xs sm:text-sm">
                             <span className="text-slate-600 truncate font-medium">
                               {cita.servicio}
                             </span>
@@ -447,7 +447,7 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
                             </span>
                           </div>
                           {cita.extra && (
-                            <p className="mt-1 text-[11px] text-indigo-700 bg-indigo-50/70 rounded-md px-2 py-0.5 truncate">
+                            <p className="mt-1 text-xs text-indigo-700 bg-indigo-50/70 rounded-md px-2 py-0.5 truncate">
                               🐾 {cita.extra}
                             </p>
                           )}
@@ -460,10 +460,10 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
                             href={getWhatsAppHref(cita)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="tap-feedback inline-flex min-h-[30px] items-center gap-1 rounded-lg bg-[#25D366] px-2 text-[11px] font-bold text-white hover:bg-emerald-600"
+                            className="tap-feedback inline-flex min-h-[34px] items-center gap-1.5 rounded-xl bg-[#25D366] px-2.5 text-xs font-bold text-white hover:bg-emerald-600 shadow-2xs"
                             title="Contactar al cliente por WhatsApp"
                           >
-                            <WhatsAppSvgIcon className="h-3 w-3" />
+                            <WhatsAppSvgIcon className="h-3.5 w-3.5" />
                             <span>WhatsApp</span>
                           </a>
 
@@ -478,10 +478,10 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
                                     'confirmada'
                                   )
                                 }
-                                className="tap-feedback inline-flex min-h-[30px] items-center gap-1 rounded-lg bg-emerald-600 px-2.5 text-[11px] font-bold text-white hover:bg-emerald-700"
+                                className="tap-feedback inline-flex min-h-[34px] items-center gap-1 rounded-xl bg-emerald-600 px-3 text-xs font-bold text-white hover:bg-emerald-700 shadow-2xs"
                                 title="Confirmar esta cita"
                               >
-                                <Check className="h-3 w-3" />
+                                <Check className="h-3.5 w-3.5" />
                                 <span>Confirmar</span>
                               </button>
                             )}
@@ -495,10 +495,10 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
                                     'atendido'
                                   )
                                 }
-                                className="tap-feedback inline-flex min-h-[30px] items-center gap-1 rounded-lg bg-sky-600 px-2.5 text-[11px] font-bold text-white hover:bg-sky-700"
+                                className="tap-feedback inline-flex min-h-[34px] items-center gap-1 rounded-xl bg-sky-600 px-3 text-xs font-bold text-white hover:bg-sky-700 shadow-2xs"
                                 title="Marcar como atendida y cobrada"
                               >
-                                <CheckCircle2 className="h-3 w-3" />
+                                <CheckCircle2 className="h-3.5 w-3.5" />
                                 <span>Atendido</span>
                               </button>
                             )}
@@ -513,20 +513,20 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
                                       'reprogramar'
                                     )
                                   }
-                                  className="tap-feedback inline-flex min-h-[30px] items-center rounded-lg border border-rose-200 bg-rose-50 px-2 text-[11px] font-bold text-rose-700 hover:bg-rose-100"
+                                  className="tap-feedback inline-flex min-h-[34px] items-center rounded-xl border border-rose-200 bg-rose-50 px-2.5 text-xs font-bold text-rose-700 hover:bg-rose-100"
                                   title="Marcar para reprogramar turno"
                                 >
-                                  <RotateCcw className="h-3 w-3" />
+                                  <RotateCcw className="h-3.5 w-3.5" />
                                 </button>
                               )}
 
                             <button
                               type="button"
                               onClick={() => onOpenCitaSheet(cita)}
-                              className="tap-feedback inline-flex min-h-[30px] items-center rounded-lg border border-slate-200 bg-slate-50 px-2 text-[11px] font-bold text-slate-700 hover:bg-slate-100"
+                              className="tap-feedback inline-flex min-h-[34px] items-center rounded-xl border border-slate-200 bg-slate-50 px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100"
                               title="Ver ficha completa y editar"
                             >
-                              <MoreHorizontal className="h-3.5 w-3.5" />
+                              <MoreHorizontal className="h-4 w-4" />
                             </button>
                           </div>
                         </div>

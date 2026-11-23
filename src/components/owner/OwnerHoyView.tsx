@@ -226,7 +226,7 @@ export const OwnerHoyView: React.FC<OwnerHoyViewProps> = ({
                       <span className="text-base font-extrabold leading-none">
                         {cita.hora}
                       </span>
-                      <span className="mt-1 text-[10px] font-bold">
+                      <span className="mt-1 text-xs font-black">
                         S/ {cita.precio}
                       </span>
                     </div>
