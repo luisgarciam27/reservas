@@ -8,6 +8,7 @@ import {
   MapPin,
   RefreshCw,
   ShoppingBag,
+  Smartphone,
   UserCheck,
 } from 'lucide-react';
 import { PWAInstallBanner } from '../components/PWABanners';
@@ -286,7 +287,7 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
     <div className="min-h-[100dvh] flex flex-col bg-slate-50 text-slate-900">
       {/* Header personalizado con nombre, logo y color del negocio */}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md pt-safe">
-        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between gap-2 px-4">
+        <div className="mx-auto flex h-14 sm:h-16 max-w-3xl items-center justify-between gap-2 px-4">
           <div className="flex min-w-0 items-center gap-2.5">
             <span
               className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl text-lg text-white"
@@ -319,15 +320,15 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
               backgroundColor: `${negocio.color}14`,
               color: negocio.color,
             }}
-            className="tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl px-3.5 text-xs sm:text-sm font-bold"
+            className="tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs sm:text-sm font-bold whitespace-nowrap"
           >
             <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Instalar App</span>
+            <span>Guardar App</span>
           </button>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-5 pb-20 space-y-4">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-4 pb-28 sm:py-5 sm:pb-12 space-y-4">
         {/* Tarjeta info negocio */}
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600">
           <span className="inline-flex items-center gap-1.5">
@@ -533,14 +534,25 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
         ) : (
           /* FLUJO PASO A PASO */
           <div className="space-y-4">
-            {/* Indicador visual del flujo */}
-            <div className="grid grid-cols-4 gap-1.5 rounded-2xl border border-slate-200 bg-white p-2 text-xs font-bold">
-              {[
-                { n: 1, t: '1. Servicio' },
-                { n: 2, t: '2. Especialista' },
-                { n: 3, t: '3. Día y Hora' },
-                { n: 4, t: '4. Confirmar' },
-              ].map((st) => (
+            {/* Indicador visual del flujo dinámico (3 o 4 pasos sin cortar texto en móvil) */}
+            <div
+              className={`grid gap-1 rounded-2xl border border-slate-200 bg-white p-1.5 text-xs font-bold ${
+                hasProfesionales ? 'grid-cols-4' : 'grid-cols-3'
+              }`}
+            >
+              {(hasProfesionales
+                ? [
+                    { n: 1 as const, label: '1. Servicio', short: '1. Servicio' },
+                    { n: 2 as const, label: '2. Equipo', short: '2. Equipo' },
+                    { n: 3 as const, label: '3. Horario', short: '3. Hora' },
+                    { n: 4 as const, label: '4. Confirmar', short: '4. Datos' },
+                  ]
+                : [
+                    { n: 1 as const, label: '1. Servicio', short: '1. Servicio' },
+                    { n: 3 as const, label: '2. Horario', short: '2. Hora' },
+                    { n: 4 as const, label: '3. Confirmar', short: '3. Datos' },
+                  ]
+              ).map((st) => (
                 <div
                   key={st.n}
                   style={
@@ -548,11 +560,12 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
                       ? { backgroundColor: negocio.color, color: '#FFFFFF' }
                       : undefined
                   }
-                  className={`flex min-h-[38px] items-center justify-center rounded-xl px-1 text-center ${
-                    step === st.n ? '' : 'text-slate-400'
+                  className={`flex min-h-[40px] items-center justify-center rounded-xl px-1.5 text-center whitespace-nowrap ${
+                    step === st.n ? 'shadow-2xs' : 'text-slate-400'
                   }`}
                 >
-                  {st.t}
+                  <span className="sm:hidden">{st.short}</span>
+                  <span className="hidden sm:inline">{st.label}</span>
                 </div>
               ))}
             </div>
@@ -941,10 +954,10 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
           </div>
         )}
 
-        <PWAInstallBanner accentColor={negocio.color} />
+        {confirmed && <PWAInstallBanner accentColor={negocio.color} />}
 
-        <footer className="pt-4 text-center text-xs text-slate-400">
-          App de reservas impulsada por{' '}
+        <footer className="pt-3 text-center text-xs text-slate-400">
+          App de reservas sin descargas ·{' '}
           <button
             type="button"
             onClick={onBackToSaaSLanding}
@@ -952,9 +965,80 @@ export const PublicBookingPage: React.FC<PublicBookingPageProps> = ({
           >
             MarIA Citas
           </button>{' '}
-          · Desarrollado con pasión, Perú 🇵🇪.
+          · Perú 🇵🇪
         </footer>
       </main>
+
+      {/* Barra inferior fija estilo App Nativa directamente en el navegador móvil */}
+      <nav
+        aria-label="Navegación rápida de la app del negocio"
+        className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-md pb-safe md:hidden"
+      >
+        <div
+          className={`mx-auto grid h-[60px] max-w-md items-center px-1 ${
+            modulos.catalogo && productos.length > 0
+              ? 'grid-cols-4'
+              : 'grid-cols-3'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('reservar');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            style={
+              activeTab === 'reservar' ? { color: negocio.color } : undefined
+            }
+            className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+              activeTab === 'reservar' ? '' : 'text-slate-500'
+            }`}
+          >
+            <Calendar className="h-5 w-5" />
+            <span>Sacar cita</span>
+          </button>
+
+          {modulos.catalogo && productos.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('catalogo');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              style={
+                activeTab === 'catalogo' ? { color: negocio.color } : undefined
+              }
+              className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+                activeTab === 'catalogo' ? '' : 'text-slate-500'
+              }`}
+            >
+              <ShoppingBag className="h-5 w-5" />
+              <span>Productos</span>
+            </button>
+          )}
+
+          <a
+            href={`https://wa.me/${negocio.whatsapp}?text=${encodeURIComponent(
+              `Hola ${negocio.nombre}, tengo una consulta sobre sus citas.`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold text-emerald-700 whitespace-nowrap"
+          >
+            <WhatsAppSvgIcon className="h-5 w-5 text-[#25D366]" />
+            <span>WhatsApp</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={() => setInstallOpen(true)}
+            className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold text-slate-600 whitespace-nowrap"
+          >
+            <Smartphone className="h-5 w-5" />
+            <span>Acceso App</span>
+          </button>
+        </div>
+      </nav>
 
       <PWAInstallModal
         open={installOpen}

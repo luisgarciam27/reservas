@@ -14,8 +14,10 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  MoreHorizontal,
   Package,
   Plus,
+  QrCode,
   Save,
   Scissors,
   Settings,
@@ -114,6 +116,7 @@ export const OwnerPanelPage: React.FC<OwnerPanelPageProps> = ({
   const [activeSection, setActiveSection] = useState<PanelSection>('agenda');
   const [agendaSubView, setAgendaSubView] = useState<'kanban' | 'hoy' | 'calendario'>('kanban');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileQrOpen, setMobileQrOpen] = useState(false);
 
   // Datos operacionales (citas, bloqueos, mascotas)
   const [citas, setCitas] = useState<AppointmentRecord[]>([]);
@@ -518,9 +521,80 @@ export const OwnerPanelPage: React.FC<OwnerPanelPageProps> = ({
           {/* MÓDULO: AGENDA Y CITAS */}
           {activeSection === 'agenda' && (
             <div className="space-y-6">
-              {/* Tarjeta Compartir App y QR */}
-              <div className="rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50/80 via-white to-slate-50 p-5 shadow-2xs sm:p-6">
-                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              {/* Barra compacta en móvil para compartir link/QR sin tapar el tablero Kanban */}
+              <div className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50/90 via-white to-slate-50 p-3 shadow-2xs lg:hidden">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-indigo-700">
+                      Link de tu App · Reservas 24/7
+                    </p>
+                    <p className="truncate text-xs font-extrabold text-slate-900">
+                      {publicUrlPath}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleCopyPublicLink}
+                      aria-label="Copiar enlace público"
+                      className="tap-feedback inline-flex min-h-[40px] items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-800"
+                    >
+                      {copiedLink ? (
+                        <Check className="h-4 w-4 text-emerald-600" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                      <span>{copiedLink ? 'Copiado' : 'Copiar'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleShareWhatsApp}
+                      aria-label="Compartir por WhatsApp"
+                      className="tap-feedback inline-flex h-[40px] w-[40px] items-center justify-center rounded-xl bg-[#25D366] text-white"
+                    >
+                      <WhatsAppSvgIcon className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMobileQrOpen((v) => !v)}
+                      aria-expanded={mobileQrOpen}
+                      aria-label="Mostrar código QR"
+                      className={`tap-feedback inline-flex min-h-[40px] items-center gap-1 rounded-xl border px-2.5 text-xs font-bold ${
+                        mobileQrOpen
+                          ? 'border-indigo-500 bg-indigo-600 text-white'
+                          : 'border-indigo-200 bg-indigo-50 text-indigo-800'
+                      }`}
+                    >
+                      <QrCode className="h-4 w-4" />
+                      <span>QR</span>
+                    </button>
+                  </div>
+                </div>
+
+                {mobileQrOpen && (
+                  <div className="mt-3 flex flex-col items-center gap-2 border-t border-indigo-100 pt-3">
+                    {qrDataUrl && (
+                      <img
+                        src={qrDataUrl}
+                        alt={`QR de ${negocio.nombre}`}
+                        className="h-36 w-36 rounded-xl border border-slate-200 bg-white p-2 object-contain"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleDownloadQr}
+                      className="tap-feedback inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-800"
+                    >
+                      <Download className="h-4 w-4" />
+                      Descargar QR (SVG)
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Tarjeta Compartir App y QR completa en escritorio */}
+              <div className="hidden lg:block rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50/80 via-white to-slate-50 p-6 shadow-2xs">
+                <div className="flex flex-row items-center justify-between gap-5">
                   <div className="space-y-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold text-indigo-800">
                       <Share2 className="h-3.5 w-3.5" /> Enlace y Código QR Oficial
@@ -587,64 +661,59 @@ export const OwnerPanelPage: React.FC<OwnerPanelPageProps> = ({
                 </div>
               </div>
 
-              {/* Barra de Sub-vistas de la Agenda: Kanban, Turnos de Hoy, Calendario */}
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-2.5 shadow-2xs">
-                <div className="flex flex-wrap items-center gap-1.5">
+              {/* Barra de Sub-vistas de la Agenda: fila única deslizable en móvil */}
+              <div className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xs">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar touch-pan-x min-w-0 flex-1">
                   <button
                     type="button"
                     onClick={() => setAgendaSubView('kanban')}
-                    className={`tap-feedback inline-flex min-h-[38px] items-center gap-1.5 rounded-xl px-3.5 text-xs font-bold transition-all ${
+                    className={`tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
                       agendaSubView === 'kanban'
                         ? 'bg-slate-900 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
                     <Kanban className="h-3.5 w-3.5 text-indigo-400" />
-                    <span>🗂️ Tablero Kanban</span>
-                    <span className="rounded-full bg-indigo-500/20 px-1.5 py-0.2 text-[10px] text-indigo-300">
-                      Recepción
-                    </span>
+                    <span>Tablero Kanban</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setAgendaSubView('hoy')}
-                    className={`tap-feedback inline-flex min-h-[38px] items-center gap-1.5 rounded-xl px-3.5 text-xs font-bold transition-all ${
+                    className={`tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
                       agendaSubView === 'hoy'
                         ? 'bg-slate-900 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
                     <Clock className="h-3.5 w-3.5" />
-                    <span>⏱️ Turnos de Hoy</span>
+                    <span>Turnos de Hoy</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setAgendaSubView('calendario')}
-                    className={`tap-feedback inline-flex min-h-[38px] items-center gap-1.5 rounded-xl px-3.5 text-xs font-bold transition-all ${
+                    className={`tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
                       agendaSubView === 'calendario'
                         ? 'bg-slate-900 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
                     <Calendar className="h-3.5 w-3.5" />
-                    <span>📅 Calendario Semanal</span>
+                    <span>Calendario</span>
                   </button>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      playNewBookingChime();
-                      showSuccess('🔔 Timbre de cita reproducido');
-                    }}
-                    className="tap-feedback inline-flex min-h-[36px] items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 text-xs font-bold text-indigo-800 hover:bg-indigo-100"
-                    title="Probar sonido de notificación de citas"
-                  >
-                    <Volume2 className="h-3.5 w-3.5 text-indigo-600" />
-                    <span>Probar timbre</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playNewBookingChime();
+                    showSuccess('🔔 Timbre de cita reproducido');
+                  }}
+                  className="tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 px-3 text-xs font-bold text-indigo-800 hover:bg-indigo-100 whitespace-nowrap"
+                  title="Probar sonido de notificación de citas"
+                >
+                  <Volume2 className="h-4 w-4 text-indigo-600" />
+                  <span className="hidden sm:inline">Probar timbre</span>
+                </button>
               </div>
 
               {loadingOps ? (
@@ -1662,6 +1731,134 @@ export const OwnerPanelPage: React.FC<OwnerPanelPageProps> = ({
           </div>
         </div>
       )}
+
+      {/* Barra inferior fija estilo App Nativa en móvil para el Panel de Administrador */}
+      <nav
+        aria-label="Navegación rápida del panel"
+        className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-md pb-safe md:hidden"
+      >
+        <div className="mx-auto grid h-[60px] max-w-lg grid-cols-5 items-center px-1">
+          <button
+            type="button"
+            onClick={() => setActiveSection('agenda')}
+            style={activeSection === 'agenda' ? { color: negocio.color } : undefined}
+            className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+              activeSection === 'agenda' ? '' : 'text-slate-500'
+            }`}
+          >
+            <Calendar className="h-5 w-5" />
+            <span>Agenda</span>
+          </button>
+
+          {modulos.servicios ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('servicios')}
+              style={
+                activeSection === 'servicios' ? { color: negocio.color } : undefined
+              }
+              className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+                activeSection === 'servicios' ? '' : 'text-slate-500'
+              }`}
+            >
+              <Scissors className="h-5 w-5" />
+              <span>Servicios</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setActiveSection('ajustes')}
+              style={activeSection === 'ajustes' ? { color: negocio.color } : undefined}
+              className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+                activeSection === 'ajustes' ? '' : 'text-slate-500'
+              }`}
+            >
+              <Settings className="h-5 w-5" />
+              <span>Ajustes</span>
+            </button>
+          )}
+
+          {modulos.clientes ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('clientes')}
+              style={
+                activeSection === 'clientes' ? { color: negocio.color } : undefined
+              }
+              className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+                activeSection === 'clientes' ? '' : 'text-slate-500'
+              }`}
+            >
+              <Users className="h-5 w-5" />
+              <span className="max-w-[68px] truncate">
+                {preset.sujetoPluralCap}
+              </span>
+            </button>
+          ) : modulos.recordatorios ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('recordatorios')}
+              style={
+                activeSection === 'recordatorios'
+                  ? { color: negocio.color }
+                  : undefined
+              }
+              className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+                activeSection === 'recordatorios' ? '' : 'text-slate-500'
+              }`}
+            >
+              <MessageSquare className="h-5 w-5" />
+              <span>Avisos</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onOpenPublicSlug(negocio.slug)}
+              className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold text-slate-500 whitespace-nowrap"
+            >
+              <ExternalLink className="h-5 w-5" />
+              <span>Ver App</span>
+            </button>
+          )}
+
+          {modulos.reportes ? (
+            <button
+              type="button"
+              onClick={() => setActiveSection('reportes')}
+              style={
+                activeSection === 'reportes' ? { color: negocio.color } : undefined
+              }
+              className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+                activeSection === 'reportes' ? '' : 'text-slate-500'
+              }`}
+            >
+              <BarChart3 className="h-5 w-5" />
+              <span>Reportes</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setActiveSection('ajustes')}
+              style={activeSection === 'ajustes' ? { color: negocio.color } : undefined}
+              className={`tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold whitespace-nowrap ${
+                activeSection === 'ajustes' ? '' : 'text-slate-500'
+              }`}
+            >
+              <Settings className="h-5 w-5" />
+              <span>Ajustes</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-bold text-slate-600 whitespace-nowrap"
+          >
+            <MoreHorizontal className="h-5 w-5" />
+            <span>Módulos</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };

@@ -262,11 +262,11 @@ export const OwnerMonthlyChart: React.FC<OwnerMonthlyChartProps> = ({
         </div>
 
         {/* Switch de modo de visualización */}
-        <div className="inline-flex rounded-xl border border-slate-200 bg-slate-100 p-1 text-xs font-bold text-slate-700">
+        <div className="flex w-full sm:w-auto items-center gap-1 overflow-x-auto no-scrollbar touch-pan-x rounded-xl border border-slate-200 bg-slate-100 p-1 text-xs font-bold text-slate-700">
           <button
             type="button"
             onClick={() => setChartMode('ambos')}
-            className={`tap-feedback rounded-lg px-3 py-1.5 transition-colors ${
+            className={`tap-feedback shrink-0 whitespace-nowrap rounded-lg px-3 py-2 transition-colors ${
               chartMode === 'ambos'
                 ? 'bg-white text-slate-900 shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -277,7 +277,7 @@ export const OwnerMonthlyChart: React.FC<OwnerMonthlyChartProps> = ({
           <button
             type="button"
             onClick={() => setChartMode('ingresos')}
-            className={`tap-feedback rounded-lg px-3 py-1.5 transition-colors ${
+            className={`tap-feedback shrink-0 whitespace-nowrap rounded-lg px-3 py-2 transition-colors ${
               chartMode === 'ingresos'
                 ? 'bg-white text-emerald-800 shadow-2xs font-extrabold'
                 : 'text-slate-600 hover:text-slate-900'
@@ -288,7 +288,7 @@ export const OwnerMonthlyChart: React.FC<OwnerMonthlyChartProps> = ({
           <button
             type="button"
             onClick={() => setChartMode('citas')}
-            className={`tap-feedback rounded-lg px-3 py-1.5 transition-colors ${
+            className={`tap-feedback shrink-0 whitespace-nowrap rounded-lg px-3 py-2 transition-colors ${
               chartMode === 'citas'
                 ? 'bg-white text-slate-900 shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900'

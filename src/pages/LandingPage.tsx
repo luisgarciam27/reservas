@@ -8,6 +8,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Home,
+  LayoutDashboard,
+  LogIn,
   MapPin,
   Moon,
   Pause,
@@ -314,24 +317,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     >
       {/* HEADER */}
       <header
-        className="sticky top-0 z-30 pt-safe"
+        className="sticky top-0 z-30 pt-safe backdrop-blur-md"
         style={{
           backgroundColor: 'var(--card)',
           borderBottom: '1px solid var(--line)',
         }}
       >
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6">
+        <div className="mx-auto flex h-14 sm:h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
           <a
             href="#top"
             className="flex items-center gap-2 whitespace-nowrap shrink-0"
           >
             <MariaLogoMark className="h-8 w-8 shrink-0" />
             <span
-              className="font-outfit text-[17px] sm:text-[20px] leading-none"
+              className="font-outfit text-[18px] sm:text-[20px] leading-none"
               style={{ color: 'var(--ink)' }}
             >
               Mar<span style={{ color: 'var(--p)' }}>IA</span>{' '}
-              <span className="hidden min-[380px]:inline">Citas</span>
+              <span>Citas</span>
             </span>
           </a>
 
@@ -370,7 +373,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </a>
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={toggleTheme}
@@ -403,7 +406,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={onViewDemo}
-                  className="tap-feedback inline-flex min-h-[40px] items-center justify-center rounded-[12px] px-3 sm:px-4 text-[13px] sm:text-[14px] font-medium whitespace-nowrap"
+                  className="tap-feedback hidden md:inline-flex min-h-[40px] items-center justify-center rounded-[12px] px-4 text-[14px] font-medium whitespace-nowrap"
                   style={{
                     backgroundColor: 'var(--card)',
                     border: '1px solid var(--line)',
@@ -421,7 +424,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     color: 'var(--onp)',
                   }}
                 >
-                  Abrir mi Panel
+                  <span className="sm:hidden">Mi Panel</span>
+                  <span className="hidden sm:inline">Abrir mi Panel</span>
                   <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               </>
@@ -430,7 +434,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={onLogin}
-                  className="hidden text-[14px] font-medium hover:underline underline-offset-4 lg:inline-block whitespace-nowrap px-2"
+                  className="hidden text-[14px] font-medium hover:underline underline-offset-4 md:inline-block whitespace-nowrap px-2"
                   style={{ color: 'var(--sub)' }}
                 >
                   Ingresar
@@ -438,7 +442,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={onViewDemo}
-                  className="tap-feedback inline-flex min-h-[40px] items-center justify-center rounded-[12px] px-2.5 sm:px-4 text-[13px] sm:text-[14px] font-medium whitespace-nowrap"
+                  className="tap-feedback hidden md:inline-flex min-h-[40px] items-center justify-center rounded-[12px] px-4 text-[14px] font-medium whitespace-nowrap"
                   style={{
                     backgroundColor: 'var(--card)',
                     border: '1px solid var(--line)',
@@ -450,13 +454,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => onCreateAccount('pro')}
-                  className="tap-feedback inline-flex min-h-[40px] items-center justify-center rounded-[12px] px-3 sm:px-4 text-[13px] sm:text-[14px] font-medium whitespace-nowrap"
+                  className="tap-feedback inline-flex min-h-[40px] items-center justify-center rounded-[12px] px-3.5 sm:px-4 text-[13px] sm:text-[14px] font-medium whitespace-nowrap"
                   style={{
                     backgroundColor: 'var(--p)',
                     color: 'var(--onp)',
                   }}
                 >
-                  Crear mi cuenta
+                  Crear cuenta
                 </button>
               </>
             )}
@@ -471,18 +475,113 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           style={{ backgroundColor: 'var(--bg)' }}
         >
           <div className="mx-auto w-full max-w-6xl px-4 pt-6 pb-10 sm:px-6 sm:py-10">
-            <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:items-center lg:gap-10">
-              {/* Columna Izquierda */}
+            <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-12 lg:items-center lg:gap-10">
+              {/* Columna Izquierda: Headline + CTAs primero en móvil para impacto inmediato */}
               <div className="lg:col-span-5">
-                {/* Diapositiva compacta en móvil con rubros y clientes felices */}
+                {/* 1. Etiqueta superior cian: Sin comisiones */}
                 <div
-                  className="mb-5 overflow-hidden rounded-[16px] lg:hidden"
+                  className="inline-flex items-center gap-1.5 rounded-[12px] px-3 py-1.5 text-[13px] sm:text-[14px] font-medium"
+                  style={{
+                    backgroundColor: 'var(--cys)',
+                    color: 'var(--cyt)',
+                  }}
+                >
+                  <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>Sin comisiones · Funciona directo en tu celular</span>
+                </div>
+
+                {/* 2. Título: 34px móvil / 56px escritorio, Outfit 700, solo "con IA" en violeta */}
+                <h1
+                  className="font-outfit mt-3.5 text-[34px] leading-[1.08] sm:text-[38px] lg:text-[56px] lg:leading-[1.03] [text-wrap:balance]"
+                  style={{ color: 'var(--ink)' }}
+                >
+                  Reservas online para tu negocio,{' '}
+                  <span style={{ color: 'var(--p)' }}>con IA</span>
+                </h1>
+
+                {/* 3. Subtítulo: 17px móvil / 20px escritorio */}
+                <p
+                  className="mt-3 text-[17px] sm:text-[20px] leading-[1.45] font-normal"
+                  style={{ color: 'var(--sub)' }}
+                >
+                  Agenda, catálogo y avisos por WhatsApp en un solo lugar. Úsala como App sin descargar ni instalar nada.
+                </p>
+
+                {/* 4. Botones: Crear mi cuenta (violeta) y Ver demo (borde) */}
+                <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      hasActiveSession ? onGoToPanel() : onCreateAccount('pro')
+                    }
+                    className="tap-feedback inline-flex min-h-[50px] items-center justify-center gap-2 rounded-[14px] px-6 text-[16px] font-medium whitespace-nowrap"
+                    style={{
+                      backgroundColor: 'var(--p)',
+                      color: 'var(--onp)',
+                    }}
+                  >
+                    {hasActiveSession ? 'Ir a mi Panel' : 'Crear mi cuenta gratis'}
+                    <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={onViewDemo}
+                    className="tap-feedback inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[14px] px-6 text-[15px] sm:text-[16px] font-medium whitespace-nowrap"
+                    style={{
+                      backgroundColor: 'var(--card)',
+                      border: '1px solid var(--line)',
+                      color: 'var(--ink)',
+                    }}
+                  >
+                    <Play className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    Probar demo interactiva
+                  </button>
+                </div>
+
+                {/* 5. Chip WhatsApp + Prueba social compacta */}
+                <div
+                  className="mt-5 space-y-2.5 pt-4"
+                  style={{ borderTop: '1px solid var(--line)' }}
+                >
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <div
+                      className="inline-flex items-center gap-2 rounded-[12px] px-3 py-1.5 text-[13px] sm:text-[14px] font-medium"
+                      style={{
+                        backgroundColor: 'var(--card)',
+                        border: '1px solid var(--line)',
+                        color: 'var(--ink)',
+                      }}
+                    >
+                      <WhatsAppSvgIcon className="h-4 w-4 shrink-0 text-[#25D366]" />
+                      <span>Avisos por WhatsApp</span>
+                    </div>
+
+                    <span
+                      className="text-[13px] font-medium"
+                      style={{ color: 'var(--sub)' }}
+                    >
+                      +120 negocios en todo el Perú y LatAm
+                    </span>
+                  </div>
+
+                  <p
+                    className="text-[13px] font-medium"
+                    style={{ color: 'var(--sub)' }}
+                  >
+                    Agenda 24/7 · Promos Flash · Ficha VIP · Listo en 2 minutos
+                  </p>
+                </div>
+
+                {/* Diapositiva compacta en móvil ubicada después de los CTAs */}
+                <div
+                  className="mt-5 overflow-hidden rounded-[16px] lg:hidden"
                   style={{
                     backgroundColor: 'var(--card)',
                     border: '1px solid var(--line)',
                   }}
                 >
-                  <div className="relative h-48 w-full overflow-hidden">
+                  <div className="relative h-44 w-full overflow-hidden">
                     <img
                       src={currentSlide.img}
                       alt={currentSlide.alt}
@@ -494,7 +593,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         type="button"
                         onClick={handlePrevSlide}
                         aria-label="Diapositiva anterior"
-                        className="flex h-8 w-8 items-center justify-center rounded-[10px]"
+                        className="flex h-9 w-9 items-center justify-center rounded-[10px]"
                         style={{
                           backgroundColor: 'var(--card)',
                           border: '1px solid var(--line)',
@@ -507,7 +606,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         type="button"
                         onClick={handleNextSlide}
                         aria-label="Siguiente diapositiva"
-                        className="flex h-8 w-8 items-center justify-center rounded-[10px]"
+                        className="flex h-9 w-9 items-center justify-center rounded-[10px]"
                         style={{
                           backgroundColor: 'var(--card)',
                           border: '1px solid var(--line)',
@@ -569,101 +668,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       })}
                     </div>
                   </div>
-                </div>
-
-                {/* 1. Etiqueta superior cian: Sin comisiones */}
-                <div
-                  className="inline-flex items-center gap-1.5 rounded-[12px] px-3 py-1.5 text-[14px] font-medium"
-                  style={{
-                    backgroundColor: 'var(--cys)',
-                    color: 'var(--cyt)',
-                  }}
-                >
-                  <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>Sin comisiones</span>
-                </div>
-
-                {/* 2. Título: 36px móvil / 56px escritorio, Outfit 700, solo "con IA" en violeta */}
-                <h1
-                  className="font-outfit mt-4 text-[36px] leading-[1.06] lg:text-[56px] lg:leading-[1.03] [text-wrap:balance]"
-                  style={{ color: 'var(--ink)' }}
-                >
-                  Reservas online para tu negocio,{' '}
-                  <span style={{ color: 'var(--p)' }}>con IA</span>
-                </h1>
-
-                {/* 3. Subtítulo: 20px */}
-                <p
-                  className="mt-4 text-[20px] leading-[1.45] font-normal"
-                  style={{ color: 'var(--sub)' }}
-                >
-                  Agenda, catálogo y avisos por WhatsApp en un solo lugar.
-                </p>
-
-                {/* 4. Botones: Crear mi cuenta (violeta) y Ver demo (borde) */}
-                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      hasActiveSession ? onGoToPanel() : onCreateAccount('pro')
-                    }
-                    className="tap-feedback inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[12px] px-6 text-[16px] font-medium whitespace-nowrap"
-                    style={{
-                      backgroundColor: 'var(--p)',
-                      color: 'var(--onp)',
-                    }}
-                  >
-                    {hasActiveSession ? 'Ir a mi Panel' : 'Crear mi cuenta'}
-                    <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={onViewDemo}
-                    className="tap-feedback inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[12px] px-6 text-[16px] font-medium whitespace-nowrap"
-                    style={{
-                      backgroundColor: 'var(--card)',
-                      border: '1px solid var(--line)',
-                      color: 'var(--ink)',
-                    }}
-                  >
-                    <Play className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    Ver demo
-                  </button>
-                </div>
-
-                {/* 5. Chip WhatsApp + Prueba social compacta */}
-                <div
-                  className="mt-5 space-y-3 pt-4"
-                  style={{ borderTop: '1px solid var(--line)' }}
-                >
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <div
-                      className="inline-flex items-center gap-2 rounded-[12px] px-3.5 py-2 text-[14px] font-medium"
-                      style={{
-                        backgroundColor: 'var(--card)',
-                        border: '1px solid var(--line)',
-                        color: 'var(--ink)',
-                      }}
-                    >
-                      <WhatsAppSvgIcon className="h-4 w-4 shrink-0 text-[#25D366]" />
-                      <span>Avisos por WhatsApp</span>
-                    </div>
-
-                    <span
-                      className="text-[13px] font-medium"
-                      style={{ color: 'var(--sub)' }}
-                    >
-                      +120 negocios en todo el Perú y LatAm
-                    </span>
-                  </div>
-
-                  <p
-                    className="text-[13px] font-medium"
-                    style={{ color: 'var(--sub)' }}
-                  >
-                    Agenda 24/7 · Promos Flash · Ficha VIP · Listo en 2 minutos
-                  </p>
                 </div>
               </div>
 
@@ -800,11 +804,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 </div>
 
-                {/* Composición Bento: Celular + Panel visual lateral (sin tapar horarios) */}
+                {/* Composición Bento: Tarjeta App nativa en móvil / Mockup celular en escritorio */}
                 <div className="flex w-full flex-col items-center gap-3.5 sm:flex-row sm:items-stretch justify-center">
-                  {/* Mockup del celular claro/oscuro */}
+                  {/* Vista App interactiva claro/oscuro */}
                   <div
-                    className="w-full max-w-[330px] sm:w-[318px] shrink-0 rounded-[16px] p-2"
+                    className="w-full sm:w-[318px] shrink-0 rounded-[16px] p-1.5 sm:p-2"
                     style={{
                       backgroundColor: 'var(--card)',
                       border: '1px solid var(--line)',
@@ -817,9 +821,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         border: '1px solid var(--line)',
                       }}
                     >
-                      {/* Barra de estado limpia */}
+                      {/* Barra de estado visible solo desde tablet/desktop para evitar efecto teléfono-dentro-de-teléfono en móvil */}
                       <div
-                        className="flex items-center justify-between px-4 py-2.5"
+                        className="hidden sm:flex items-center justify-between px-4 py-2.5"
                         style={{
                           backgroundColor: 'var(--card)',
                           borderBottom: '1px solid var(--line)',
@@ -1195,8 +1199,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
 
-                  {/* Panel lateral Bento: Foto real en escritorio + Promos Flash + Estado sin tapar el celular */}
-                  <div className="flex w-full max-w-[330px] sm:max-w-none flex-1 min-w-0 flex-col gap-3">
+                  {/* Panel lateral Bento: Foto real en escritorio + Promos Flash + Estado */}
+                  <div className="flex w-full flex-1 min-w-0 flex-col gap-3">
                     {/* Diapositiva real en escritorio dentro de marco plano 1px */}
                     <div
                       onMouseEnter={() => setSlidePaused(true)}
@@ -1681,8 +1685,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             </div>
 
-            {/* 3 Rubros visuales con tarjetas planas limpias (sin gradientes ni sombras fuertes) */}
-            <div className="mt-7 flex gap-3.5 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:pb-0">
+            {/* 3 Rubros visuales con tarjetas planas limpias */}
+            <div className="mt-7 flex gap-3.5 overflow-x-auto no-scrollbar touch-pan-x snap-x snap-mandatory pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:pb-0">
               {[
                 {
                   img: heroVeterinariaImg,
@@ -2101,7 +2105,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </main>
 
       <footer
-        className="py-6 text-center text-[14px]"
+        className="py-6 pb-24 text-center text-[14px] md:pb-6"
         style={{
           backgroundColor: 'var(--bg)',
           borderTop: '1px solid var(--line)',
@@ -2116,6 +2120,60 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p>Desarrollado con pasión, Perú 🇵🇪.</p>
         </div>
       </footer>
+
+      {/* Barra inferior fija estilo App Móvil sin necesidad de instalar */}
+      <nav
+        aria-label="Navegación móvil de MarIA Citas"
+        className="fixed bottom-0 left-0 right-0 z-40 border-t backdrop-blur-md pb-safe md:hidden"
+        style={{
+          backgroundColor: 'var(--card)',
+          borderColor: 'var(--line)',
+        }}
+      >
+        <div className="mx-auto grid h-[60px] max-w-md grid-cols-4 items-center px-1">
+          <a
+            href="#top"
+            className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-semibold whitespace-nowrap"
+            style={{ color: 'var(--p)' }}
+          >
+            <Home className="h-5 w-5" aria-hidden="true" />
+            <span>Inicio</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={onViewDemo}
+            className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-semibold whitespace-nowrap"
+            style={{ color: 'var(--sub)' }}
+          >
+            <Smartphone className="h-5 w-5" aria-hidden="true" />
+            <span>Demo App</span>
+          </button>
+
+          <a
+            href="#planes"
+            className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-semibold whitespace-nowrap"
+            style={{ color: 'var(--sub)' }}
+          >
+            <Tag className="h-5 w-5" aria-hidden="true" />
+            <span>Planes</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={hasActiveSession ? onGoToPanel : onLogin}
+            className="tap-feedback flex h-full flex-col items-center justify-center gap-0.5 text-[11px] font-semibold whitespace-nowrap"
+            style={{ color: 'var(--ink)' }}
+          >
+            {hasActiveSession ? (
+              <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <LogIn className="h-5 w-5" aria-hidden="true" />
+            )}
+            <span>{hasActiveSession ? 'Mi Panel' : 'Ingresar'}</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };

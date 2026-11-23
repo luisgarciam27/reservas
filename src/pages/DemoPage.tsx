@@ -213,7 +213,7 @@ export const DemoPage: React.FC<DemoPageProps> = ({
     <>
       {/* Cinta superior discreta de regreso a MarIA Citas */}
       <div
-        className="sticky top-0 z-40 px-4 py-2"
+        className="relative z-40 px-4 py-2 md:sticky md:top-0"
         style={{
           backgroundColor: 'var(--card)',
           borderBottom: '1px solid var(--line)',
@@ -224,11 +224,12 @@ export const DemoPage: React.FC<DemoPageProps> = ({
           <button
             type="button"
             onClick={onBackToSaaSLanding}
-            className="inline-flex min-h-[34px] items-center gap-1.5 font-semibold hover:underline underline-offset-4"
+            className="inline-flex min-h-[38px] items-center gap-1.5 font-semibold hover:underline underline-offset-4 whitespace-nowrap"
             style={{ color: 'var(--ink)' }}
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Volver a MarIA Citas
+            <ArrowLeft className="h-3.5 w-3.5 shrink-0" />
+            <span className="sm:hidden">Volver</span>
+            <span className="hidden sm:inline">Volver a MarIA Citas</span>
           </button>
           <span
             className="hidden sm:inline font-medium"
@@ -239,13 +240,13 @@ export const DemoPage: React.FC<DemoPageProps> = ({
           <button
             type="button"
             onClick={onCreateAccount}
-            className="tap-feedback inline-flex min-h-[34px] items-center gap-1.5 rounded-[10px] px-3 font-medium"
+            className="tap-feedback inline-flex min-h-[38px] items-center gap-1.5 rounded-[10px] px-3 font-medium whitespace-nowrap"
             style={{
               backgroundColor: 'var(--p)',
               color: 'var(--onp)',
             }}
           >
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
             Crear mi cuenta
           </button>
         </div>
@@ -273,7 +274,7 @@ export const DemoPage: React.FC<DemoPageProps> = ({
           className="min-h-[100dvh] flex flex-col transition-colors duration-300"
           style={{ backgroundColor: rubro.colores.fondoSuave }}
         >
-          <header className="sticky top-[50px] z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
+          <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur-md md:top-[54px]">
             <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-2 px-4">
               <div className="flex min-w-0 items-center gap-2.5">
                 <span

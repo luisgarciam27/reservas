@@ -65,22 +65,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-slate-50 px-4 py-6 sm:justify-center sm:px-6">
+    <div className="min-h-[100dvh] flex flex-col bg-slate-50 px-4 py-5 pb-10 sm:justify-center sm:px-6">
       <div className="mx-auto w-full max-w-md">
         <button
           type="button"
           onClick={onBack}
-          className="tap-feedback mb-4 inline-flex min-h-[42px] items-center gap-1.5 rounded-xl px-2 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-900"
+          className="tap-feedback mb-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-2.5 text-xs font-bold text-slate-600 hover:bg-white hover:text-slate-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a MarIA Citas
         </button>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
           <div className="flex items-center gap-3">
             <MariaLogoMark className="h-10 w-10 shrink-0" />
             <div>
-              <h1 className="text-xl font-extrabold text-slate-900">
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900">
                 {mode === 'register'
                   ? 'Crea tu cuenta en MarIA Citas'
                   : 'Ingresa a tu panel'}
@@ -101,7 +101,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 setMode('register');
                 setError(null);
               }}
-              className={`min-h-[40px] rounded-lg text-xs font-bold transition-colors ${
+              className={`min-h-[44px] rounded-lg text-xs font-bold transition-colors ${
                 mode === 'register'
                   ? 'bg-white text-slate-900 shadow-2xs'
                   : 'text-slate-600'
@@ -115,7 +115,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 setMode('login');
                 setError(null);
               }}
-              className={`min-h-[40px] rounded-lg text-xs font-bold transition-colors ${
+              className={`min-h-[44px] rounded-lg text-xs font-bold transition-colors ${
                 mode === 'login'
                   ? 'bg-white text-slate-900 shadow-2xs'
                   : 'text-slate-600'
@@ -126,7 +126,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           </div>
 
           {!isSupabaseConfigured && (
-            <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50/70 px-3.5 py-2.5 text-[11px] leading-relaxed text-indigo-900">
+            <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50/70 px-3.5 py-2.5 text-xs leading-relaxed text-indigo-900">
               <strong>Modo vista previa local:</strong> Puedes crear tu cuenta,
               completar el onboarding y probar tu link <code>/n/tu-negocio</code>{' '}
               al instante sin esperar llaves de Supabase.
@@ -149,7 +149,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   setEmailConfirmSent(false);
                   setMode('login');
                 }}
-                className="mt-4 min-h-[44px] w-full rounded-xl bg-emerald-700 text-xs font-bold text-white"
+                className="mt-4 min-h-[48px] w-full rounded-xl bg-emerald-700 text-sm font-bold text-white"
               >
                 Ir a Iniciar sesión
               </button>
@@ -174,7 +174,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                         placeholder="Ej. Andrea Lozano"
                         value={nombre}
                         onChange={(e) => setNombre(e.target.value)}
-                        className="min-h-[46px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-sm text-slate-900 focus:border-indigo-600 focus:outline-none"
+                        className="min-h-[48px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-base text-slate-900 focus:border-indigo-600 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -200,7 +200,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                             e.target.value.replace(/\D/g, '').slice(0, 9)
                           )
                         }
-                        className="min-h-[46px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-sm text-slate-900 tabular-nums focus:border-indigo-600 focus:outline-none"
+                        className="min-h-[48px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-base text-slate-900 tabular-nums focus:border-indigo-600 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -224,7 +224,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="dueño@tunegocio.pe"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="min-h-[46px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-sm text-slate-900 focus:border-indigo-600 focus:outline-none"
+                    className="min-h-[48px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-base text-slate-900 focus:border-indigo-600 focus:outline-none"
                   />
                 </div>
               </div>
@@ -249,7 +249,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     placeholder="Mínimo 6 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="min-h-[46px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-sm text-slate-900 focus:border-indigo-600 focus:outline-none"
+                    className="min-h-[48px] w-full rounded-xl border border-slate-300 pl-10 pr-3 text-base text-slate-900 focus:border-indigo-600 focus:outline-none"
                   />
                 </div>
               </div>
@@ -266,7 +266,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="tap-feedback flex min-h-[50px] w-full items-center justify-center rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-xs hover:bg-indigo-700 disabled:opacity-60"
+                className="tap-feedback flex min-h-[52px] w-full items-center justify-center rounded-xl bg-indigo-600 px-4 text-sm font-bold text-white shadow-xs hover:bg-indigo-700 disabled:opacity-60"
               >
                 {loading
                   ? 'Procesando...'

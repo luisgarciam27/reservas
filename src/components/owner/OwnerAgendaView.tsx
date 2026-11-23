@@ -156,7 +156,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
       </div>
 
       {/* Selector rápido de día */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar touch-pan-x pb-1">
         {weekDates.map((wd) => {
           const active = selectedDate === wd.ymd;
           return (
@@ -173,7 +173,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
                     }
                   : undefined
               }
-              className={`tap-feedback min-h-[44px] shrink-0 rounded-xl border px-3.5 text-xs font-bold capitalize ${
+              className={`tap-feedback min-h-[44px] shrink-0 rounded-xl border px-3.5 text-xs font-bold capitalize whitespace-nowrap ${
                 active
                   ? ''
                   : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -219,7 +219,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
                   <button
                     type="button"
                     onClick={() => onToggleBlockSlot(selectedDate, hora)}
-                    className="tap-feedback inline-flex min-h-[44px] items-center gap-1 rounded-xl border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-800"
+                    className="tap-feedback inline-flex min-h-[44px] items-center gap-1 rounded-xl border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-800 whitespace-nowrap"
                   >
                     <Unlock className="h-3.5 w-3.5" />
                     Desbloquear
@@ -246,7 +246,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
                     <button
                       type="button"
                       onClick={() => openNewModalAtHour(hora)}
-                      className="tap-feedback min-h-[44px] rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-800 hover:bg-slate-50"
+                      className="tap-feedback min-h-[44px] rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-800 hover:bg-slate-50 whitespace-nowrap"
                     >
                       + Agendar
                     </button>
@@ -312,7 +312,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
         </div>
       ) : (
         /* VISTA SEMANA (desplazable horizontalmente) */
-        <div className="flex gap-3 overflow-x-auto pb-3">
+        <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x snap-mandatory touch-pan-x pb-3">
           {weekDates.map((wd) => {
             const dayItems = citas
               .filter((c) => c.fecha === wd.ymd && c.estado !== 'cancelada')
@@ -320,7 +320,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
             return (
               <div
                 key={wd.ymd}
-                className="w-[240px] shrink-0 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs"
+                className="w-[78vw] max-w-[260px] shrink-0 snap-center rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs"
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                   <span className="text-sm font-bold capitalize text-slate-900">
@@ -352,7 +352,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
                             </span>
                             <span
                               style={{ color: st.text }}
-                              className="text-[10px] font-bold"
+                              className="text-xs font-bold"
                             >
                               {st.label}
                             </span>
@@ -360,7 +360,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
                           <p className="mt-1 truncate text-xs font-bold text-slate-800">
                             {dc.cliente}
                           </p>
-                          <p className="truncate text-[11px] text-slate-500">
+                          <p className="truncate text-xs text-slate-500">
                             {dc.servicio}
                           </p>
                         </button>
@@ -374,7 +374,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
         </div>
       )}
 
-      {/* Botón flotante "+ Nueva cita" */}
+      {/* Botón flotante "+ Nueva cita" en zona pulgar derecha sobre la barra inferior */}
       <button
         type="button"
         onClick={() => {
@@ -382,7 +382,7 @@ export const OwnerAgendaView: React.FC<OwnerAgendaViewProps> = ({
           setShowNewCitaSheet(true);
         }}
         style={{ backgroundColor: rubro.colores.primario }}
-        className="tap-feedback fixed bottom-20 left-4 z-30 inline-flex min-h-[52px] items-center gap-2 rounded-2xl px-5 text-sm font-bold text-white shadow-xl md:bottom-6 md:left-auto md:right-24"
+        className="tap-feedback fixed bottom-[76px] right-4 z-30 inline-flex min-h-[50px] items-center gap-2 rounded-2xl px-4 text-sm font-bold text-white shadow-xl md:bottom-6 md:right-24"
       >
         <Plus className="h-5 w-5" />
         Nueva cita
