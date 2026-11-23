@@ -106,6 +106,7 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
   onOpenNewCitaModal,
 }) => {
   const [dateFilter, setDateFilter] = useState<DateFilterOption>('todas');
+  const [activeMobileCol, setActiveMobileCol] = useState<string>('todas');
   const [searchQuery, setSearchQuery] = useState('');
   const [soundActive, setSoundActive] = useState<boolean>(() =>
     isSoundAlertEnabled()
@@ -266,14 +267,14 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
 
         {/* Filtros de Fecha y Búsqueda */}
         <div className="mt-4 flex flex-col gap-3 pt-3 border-t border-slate-100 sm:flex-row sm:items-center sm:justify-between">
-          {/* Opciones de Fecha */}
-          <div className="flex flex-wrap items-center gap-1 rounded-xl bg-slate-100 p-1 text-xs font-bold text-slate-700">
+          {/* Opciones de Fecha con scroll horizontal suave */}
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar rounded-xl bg-slate-100 p-1 text-xs font-bold text-slate-700">
             <button
               type="button"
               onClick={() => setDateFilter('todas')}
-              className={`tap-feedback rounded-lg px-2.5 py-1.5 transition-colors ${
+              className={`tap-feedback shrink-0 rounded-lg px-3 py-1.5 transition-colors ${
                 dateFilter === 'todas'
-                  ? 'bg-white text-slate-900 shadow-2xs'
+                  ? 'bg-white text-slate-900 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -282,7 +283,7 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
             <button
               type="button"
               onClick={() => setDateFilter('hoy')}
-              className={`tap-feedback rounded-lg px-2.5 py-1.5 transition-colors ${
+              className={`tap-feedback shrink-0 rounded-lg px-3 py-1.5 transition-colors ${
                 dateFilter === 'hoy'
                   ? 'bg-white text-indigo-700 font-extrabold shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -293,7 +294,7 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
             <button
               type="button"
               onClick={() => setDateFilter('manana')}
-              className={`tap-feedback rounded-lg px-2.5 py-1.5 transition-colors ${
+              className={`tap-feedback shrink-0 rounded-lg px-3 py-1.5 transition-colors ${
                 dateFilter === 'manana'
                   ? 'bg-white text-slate-900 shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -304,7 +305,7 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
             <button
               type="button"
               onClick={() => setDateFilter('semana')}
-              className={`tap-feedback rounded-lg px-2.5 py-1.5 transition-colors ${
+              className={`tap-feedback shrink-0 rounded-lg px-3 py-1.5 transition-colors ${
                 dateFilter === 'semana'
                   ? 'bg-white text-slate-900 shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -315,7 +316,7 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
             <button
               type="button"
               onClick={() => setDateFilter('mes')}
-              className={`tap-feedback rounded-lg px-2.5 py-1.5 transition-colors ${
+              className={`tap-feedback shrink-0 rounded-lg px-3 py-1.5 transition-colors ${
                 dateFilter === 'mes'
                   ? 'bg-white text-slate-900 shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -339,9 +340,60 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
         </div>
       </div>
 
-      {/* Columnas Kanban */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4 items-start">
+      {/* Switcher de columnas rápido para móviles (< md) */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar md:hidden">
+        <button
+          type="button"
+          onClick={() => setActiveMobileCol('todas')}
+          className={`tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1 rounded-xl px-3 text-xs font-bold border transition-all ${
+            activeMobileCol === 'todas'
+              ? 'border-slate-900 bg-slate-900 text-white shadow-xs font-extrabold'
+              : 'border-slate-200 bg-white text-slate-700'
+          }`}
+        >
+          <span>📱 Deslizar Todo</span>
+        </button>
         {KANBAN_COLUMNS.map((col) => {
+          const count = filteredCitas.filter((c) =>
+            col.estados.includes(c.estado)
+          ).length;
+          const active = activeMobileCol === col.id;
+          return (
+            <button
+              key={col.id}
+              type="button"
+              onClick={() => setActiveMobileCol(col.id)}
+              className={`tap-feedback inline-flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-bold border transition-all ${
+                active
+                  ? 'border-indigo-600 bg-indigo-600 text-white shadow-xs font-extrabold'
+                  : 'border-slate-200 bg-white text-slate-700'
+              }`}
+            >
+              <span>{col.icon}</span>
+              <span>{col.title.split('/')[0].trim()}</span>
+              <span
+                className={`rounded-full px-1.5 py-0.2 text-[11px] font-black tabular-nums ${
+                  active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                }`}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Columnas Kanban: En móvil carrusel snap o columna única; en desktop grid de 4 */}
+      <div
+        className={
+          activeMobileCol === 'todas'
+            ? 'flex overflow-x-auto snap-x snap-mandatory gap-3 pb-3 no-scrollbar md:grid md:grid-cols-2 xl:grid-cols-4 md:overflow-visible items-start'
+            : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start'
+        }
+      >
+        {KANBAN_COLUMNS.filter(
+          (col) => activeMobileCol === 'todas' || col.id === activeMobileCol
+        ).map((col) => {
           const colCitas = filteredCitas
             .filter((c) => col.estados.includes(c.estado))
             .sort((a, b) => {
@@ -357,7 +409,11 @@ export const OwnerKanbanView: React.FC<OwnerKanbanViewProps> = ({
           return (
             <div
               key={col.id}
-              className="flex flex-col rounded-3xl border bg-slate-50/70 p-3.5 shadow-2xs min-h-[500px]"
+              className={`flex flex-col rounded-3xl border bg-slate-50/70 p-3.5 shadow-2xs transition-all ${
+                activeMobileCol === 'todas'
+                  ? 'w-[86vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink md:snap-none'
+                  : 'w-full'
+              }`}
               style={{ borderColor: col.colorBorder }}
             >
               {/* Header de Columna */}

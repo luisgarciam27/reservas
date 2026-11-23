@@ -507,7 +507,7 @@ export const OwnerPanelPage: React.FC<OwnerPanelPageProps> = ({
         </aside>
 
         {/* CONTENIDO PRINCIPAL DEL PANEL */}
-        <main className="min-w-0 flex-1 pb-16">
+        <main className="min-w-0 flex-1 pb-24 md:pb-16">
           {notice && (
             <div className="mb-4 flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-bold text-emerald-900">
               <Check className="h-4 w-4 shrink-0 text-emerald-700" />
