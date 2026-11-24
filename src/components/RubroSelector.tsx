@@ -220,100 +220,100 @@ export const RubroSelector: React.FC<RubroSelectorProps> = ({
           </p>
         </div>
 
-        {/* 3 soluciones concretas para el negocio */}
-        <div className="mx-auto mt-6 grid w-full max-w-5xl grid-cols-1 gap-3 sm:grid-cols-3">
+        {/* 3 pasos ultra vendedores y visuales en 3 clics */}
+        <div className="mx-auto mt-6 grid w-full max-w-4xl grid-cols-1 gap-3 sm:grid-cols-3">
           <div
-            className="flex items-start gap-3 rounded-[14px] p-3.5"
+            className="flex items-center gap-3.5 rounded-[16px] p-4 shadow-2xs"
             style={{
               backgroundColor: 'var(--card)',
               border: '1px solid var(--line)',
             }}
           >
-            <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] font-outfit text-lg font-extrabold"
               style={{
                 backgroundColor: 'var(--ps)',
                 color: 'var(--p)',
               }}
             >
-              <CalendarCheck2 className="h-4 w-4" aria-hidden="true" />
-            </div>
+              1
+            </span>
             <div className="min-w-0">
               <p
-                className="text-[14px] font-semibold"
+                className="text-[14px] font-bold"
                 style={{ color: 'var(--ink)' }}
               >
-                Agenda llena sin chatear
+                Eligen en 3 clics
               </p>
               <p
-                className="mt-0.5 text-[13px] leading-[1.45]"
+                className="text-[12px] leading-snug"
                 style={{ color: 'var(--sub)' }}
               >
-                Reservas en 3 toques las 24 horas con tu propio enlace.
+                Servicio, hora y profesional al instante.
               </p>
             </div>
           </div>
 
           <div
-            className="flex items-start gap-3 rounded-[14px] p-3.5"
+            className="flex items-center gap-3.5 rounded-[16px] p-4 shadow-2xs"
             style={{
               backgroundColor: 'var(--card)',
               border: '1px solid var(--line)',
             }}
           >
-            <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] font-outfit text-lg font-extrabold"
               style={{
                 backgroundColor: 'rgba(245, 158, 11, 0.14)',
                 color: '#F59E0B',
               }}
             >
-              <Tag className="h-4 w-4" aria-hidden="true" />
-            </div>
+              2
+            </span>
             <div className="min-w-0">
               <p
-                className="text-[14px] font-semibold"
+                className="text-[14px] font-bold"
                 style={{ color: 'var(--ink)' }}
               >
-                Más ventas con Promos
+                Cero cruces de agenda
               </p>
               <p
-                className="mt-0.5 text-[13px] leading-[1.45]"
+                className="text-[12px] leading-snug"
                 style={{ color: 'var(--sub)' }}
               >
-                Llena horas vacías con descuentos y vende productos extras.
+                Horario ocupado se bloquea solo.
               </p>
             </div>
           </div>
 
           <div
-            className="flex items-start gap-3 rounded-[14px] p-3.5"
+            className="flex items-center gap-3.5 rounded-[16px] p-4 shadow-2xs"
             style={{
               backgroundColor: 'var(--card)',
               border: '1px solid var(--line)',
             }}
           >
-            <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] font-outfit text-lg font-extrabold"
               style={{
                 backgroundColor: 'var(--cys)',
                 color: 'var(--cyt)',
               }}
             >
-              <Bell className="h-4 w-4" aria-hidden="true" />
-            </div>
+              3
+            </span>
             <div className="min-w-0">
               <p
-                className="text-[14px] font-semibold"
+                className="text-[14px] font-bold"
                 style={{ color: 'var(--ink)' }}
               >
-                Cero cruces ni olvidos
+                ¡Cita confirmada!
               </p>
               <p
-                className="mt-0.5 text-[13px] leading-[1.45]"
+                className="text-[12px] leading-snug"
                 style={{ color: 'var(--sub)' }}
               >
-                Horarios bloqueados al instante y avisos automáticos.
+                Aviso automático y recordatorio.
               </p>
             </div>
           </div>
