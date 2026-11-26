@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useRegisterSW } from 'virtual:pwa-register/react';
+
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -105,17 +105,32 @@ export function useOnlineStatus(): boolean {
 }
 
 export function useSWUpdate() {
-  const {
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
-  } = useRegisterSW({
-    onRegisterError(error) {
-      console.error('Error al registrar Service Worker:', error);
-    },
-  });
+  const [needRefresh, setNeedRefresh] = useState(false);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker.ready.then((reg) => {
+      setRegistration(reg);
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        if (newSW) {
+          newSW.addEventListener('statechange', () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              setNeedRefresh(true);
+            }
+          });
+        }
+      });
+    });
+  }, []);
 
   const applyUpdate = async () => {
-    await updateServiceWorker(true);
+    if (registration && registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+    window.location.reload();
   };
 
   const dismissUpdate = () => {

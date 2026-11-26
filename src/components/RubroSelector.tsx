@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
   ArrowRight,
-  Bell,
-  Briefcase,
-  CalendarCheck2,
+  Clock,
   Moon,
   Smartphone,
   Sparkles,
   Sun,
-  Tag,
-  User,
 } from 'lucide-react';
 import { RUBROS, type RubroConfig, type RubroKey } from '../config/rubros';
 import type { UserSession } from '../types/app';
@@ -18,7 +14,7 @@ import { MariaLogoMark, RubroSvgIcon } from './RubroIcons';
 interface RubroSelectorProps {
   session: UserSession;
   onSelectRubro: (rubro: RubroKey) => void;
-  onOpenAuthSheet: (mode?: 'register' | 'login' | 'owner') => void;
+  onOpenAuthSheet?: (mode?: 'register' | 'login' | 'owner') => void;
 }
 
 type ThemeMode = 'light' | 'dark';
@@ -48,7 +44,6 @@ function getInitialTheme(): ThemeMode {
 export const RubroSelector: React.FC<RubroSelectorProps> = ({
   session,
   onSelectRubro,
-  onOpenAuthSheet,
 }) => {
   const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
 
@@ -126,41 +121,16 @@ export const RubroSelector: React.FC<RubroSelectorProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() =>
-                onOpenAuthSheet(session.role === 'owner' ? 'owner' : 'login')
-              }
-              className="tap-feedback inline-flex min-h-[40px] items-center gap-1.5 rounded-[12px] px-3 text-[13px] font-medium whitespace-nowrap"
+            <span
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-semibold whitespace-nowrap"
               style={{
-                backgroundColor: 'var(--bg)',
-                border: '1px solid var(--line)',
-                color: 'var(--ink)',
+                backgroundColor: 'var(--cys)',
+                color: 'var(--cyt)',
               }}
             >
-              {session.role === 'owner' ? (
-                <>
-                  <Briefcase
-                    className="h-3.5 w-3.5"
-                    style={{ color: 'var(--cyt)' }}
-                  />
-                  <span>Panel Dueño</span>
-                </>
-              ) : session.role === 'client' ? (
-                <>
-                  <User
-                    className="h-3.5 w-3.5"
-                    style={{ color: 'var(--p)' }}
-                  />
-                  <span>{session.nombre.split(' ')[0]}</span>
-                </>
-              ) : (
-                <>
-                  <User className="h-3.5 w-3.5" />
-                  <span>Probar acceso</span>
-                </>
-              )}
-            </button>
+              <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              Prueba libre sin registro
+            </span>
 
             <button
               type="button"
@@ -210,12 +180,12 @@ export const RubroSelector: React.FC<RubroSelectorProps> = ({
           </h1>
 
           <p
-            className="mt-3 text-[16px] sm:text-[18px] leading-[1.55]"
+            className="mt-2.5 text-[15px] sm:text-[17px] leading-[1.45]"
             style={{ color: 'var(--sub)' }}
           >
-            Tus clientes ven horarios reales, eligen servicio y reservan solos directo desde tu App, sin esperar que respondas mensajes.{' '}
+            Elige un negocio, mira sus fotos y{' '}
             <strong style={{ color: 'var(--ink)' }}>
-              Elige un rubro y pruébala en vivo:
+              reserva una cita en vivo en 3 clics:
             </strong>
           </p>
         </div>
@@ -340,19 +310,28 @@ export const RubroSelector: React.FC<RubroSelectorProps> = ({
         >
           {RUBRO_ORDER.map((key) => {
             const item: RubroConfig = RUBROS[key];
+            const minPrice = Math.min(...item.servicios.map((s) => s.precio));
+            const previewServices = item.servicios.slice(0, 2);
+
             return (
               <button
                 key={key}
                 type="button"
                 onClick={() => onSelectRubro(key)}
-                className="tap-feedback group flex flex-col overflow-hidden rounded-[16px] text-left transition-transform duration-200 hover:-translate-y-1"
+                className="tap-feedback group flex flex-col overflow-hidden rounded-[20px] text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
                 style={{
                   backgroundColor: 'var(--card)',
-                  border: '1px solid var(--line)',
+                  border: `1.5px solid ${item.colores.bordeSuave}`,
                 }}
               >
-                {/* Imagen superior limpia sin degradados ni texto encima ilegible */}
-                <div className="relative h-44 w-full overflow-hidden">
+                {/* Franja superior viva con el color propio del rubro */}
+                <div
+                  className="h-1.5 w-full"
+                  style={{ backgroundColor: item.colores.primario }}
+                />
+
+                {/* Imagen superior luminosa */}
+                <div className="relative h-48 w-full overflow-hidden">
                   <img
                     src={item.heroImage}
                     alt={item.heroAlt}
@@ -360,70 +339,124 @@ export const RubroSelector: React.FC<RubroSelectorProps> = ({
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div
-                    className="absolute top-3 left-3 flex h-10 w-10 items-center justify-center rounded-[12px]"
+                    className="absolute top-3 left-3 flex h-11 w-11 items-center justify-center rounded-[14px] shadow-md"
                     style={{
-                      backgroundColor: 'var(--card)',
-                      border: '1px solid var(--line)',
-                      color: 'var(--p)',
+                      backgroundColor: item.colores.primario,
+                      color: '#FFFFFF',
                     }}
                   >
                     <RubroSvgIcon rubro={key} className="h-5 w-5" />
                   </div>
                   <span
-                    className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-[10px] px-2.5 py-1 text-[12px] font-medium"
+                    className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-[12px] px-2.5 py-1 text-[12px] font-bold shadow-xs backdrop-blur-xs"
                     style={{
-                      backgroundColor: 'var(--cys)',
-                      color: 'var(--cyt)',
-                      border: '1px solid var(--line)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.94)',
+                      color: item.colores.primario,
                     }}
                   >
                     <Smartphone className="h-3.5 w-3.5" aria-hidden="true" />
                     App en vivo
                   </span>
+                  <span
+                    className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-[10px] px-2.5 py-1 text-[11px] font-bold shadow-xs backdrop-blur-xs"
+                    style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.94)',
+                      color: '#0F172A',
+                    }}
+                  >
+                    <Clock
+                      className="h-3 w-3"
+                      style={{ color: item.colores.primario }}
+                      aria-hidden="true"
+                    />
+                    {item.servicios.length} servicios · Desde S/ {minPrice}
+                  </span>
                 </div>
 
-                {/* Cuerpo comercial claro */}
+                {/* Cuerpo comercial vivo */}
                 <div className="flex flex-1 flex-col p-5">
-                  <span
-                    className="text-[12px] font-medium uppercase tracking-wider"
-                    style={{ color: 'var(--cyt)' }}
-                  >
-                    {item.rubroLabel}
-                  </span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span
+                      className="inline-flex items-center rounded-lg px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider"
+                      style={{
+                        backgroundColor: item.colores.superficieDestacada,
+                        color: item.colores.primario,
+                      }}
+                    >
+                      {item.rubroLabel}
+                    </span>
+                    <span
+                      className="text-[11px] font-semibold"
+                      style={{ color: 'var(--sub)' }}
+                    >
+                      {item.ciudad}
+                    </span>
+                  </div>
+
                   <h2
-                    className="font-outfit mt-1 text-[22px] leading-tight"
+                    className={`mt-2 text-[22px] leading-tight font-bold ${
+                      item.tipografia.esEditorialSerif
+                        ? 'font-display-serif text-[25px]'
+                        : 'font-outfit'
+                    }`}
                     style={{ color: 'var(--ink)' }}
                   >
                     {item.nombre}
                   </h2>
-                  <p
-                    className="mt-1.5 mb-4 text-[14px] leading-[1.5]"
-                    style={{ color: 'var(--sub)' }}
-                  >
-                    {RUBRO_SOLUTIONS[key]}
-                  </p>
 
-                  <div
-                    className="mt-auto flex items-center justify-between pt-4"
-                    style={{ borderTop: '1px solid var(--line)' }}
-                  >
-                    <span
-                      className="text-[14px] font-semibold"
-                      style={{ color: 'var(--p)' }}
-                    >
-                      {session.role === 'owner'
-                        ? 'Abrir Panel Dueño'
-                        : 'Abrir App de Citas'}
-                    </span>
-                    <span
-                      className="flex h-9 w-9 items-center justify-center rounded-[10px] transition-transform duration-200 group-hover:translate-x-0.5"
+                  {/* Mini galería visual de servicios */}
+                  <div className="mt-3 space-y-2">
+                    {previewServices.map((svc) => (
+                      <div
+                        key={svc.id}
+                        className="flex items-center justify-between gap-2.5 rounded-[12px] p-1.5 pr-3 text-[12px]"
+                        style={{
+                          backgroundColor: 'var(--bg)',
+                          border: '1px solid var(--line)',
+                        }}
+                      >
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <img
+                            src={svc.imagen || item.heroImage}
+                            alt={svc.nombre}
+                            referrerPolicy="no-referrer"
+                            className="h-10 w-12 shrink-0 rounded-[8px] object-cover"
+                          />
+                          <span
+                            className="truncate font-semibold"
+                            style={{ color: 'var(--ink)' }}
+                          >
+                            {svc.nombre}
+                          </span>
+                        </div>
+                        <span
+                          className="shrink-0 font-extrabold tabular-nums"
+                          style={{ color: item.colores.primario }}
+                        >
+                          S/ {svc.precio}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Botón principal vivo en el color del rubro */}
+                  <div className="mt-auto pt-4">
+                    <div
+                      className="flex min-h-[46px] w-full items-center justify-between rounded-[12px] px-4 text-[14px] font-bold text-white shadow-xs transition-transform duration-200 group-hover:translate-y-[-1px]"
                       style={{
-                        backgroundColor: 'var(--p)',
-                        color: 'var(--onp)',
+                        backgroundColor: item.colores.primario,
                       }}
                     >
-                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    </span>
+                      <span>
+                        {session.role === 'owner'
+                          ? 'Abrir Panel Dueño'
+                          : 'Probar y sacar cita'}
+                      </span>
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                        aria-hidden="true"
+                      />
+                    </div>
                   </div>
                 </div>
               </button>

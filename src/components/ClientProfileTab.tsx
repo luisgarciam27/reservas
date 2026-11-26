@@ -24,7 +24,8 @@ interface ClientProfileTabProps {
   session: UserSession;
   lastBooking: BookedSummary | null;
   localBookings: AppointmentRecord[];
-  onOpenAuthSheet: (mode?: 'register' | 'login' | 'owner') => void;
+  isDemoMode?: boolean;
+  onOpenAuthSheet?: (mode?: 'register' | 'login' | 'owner') => void;
   onOpenInstallModal: () => void;
   onStartBooking: () => void;
   onLogout: () => void;
@@ -44,6 +45,7 @@ export const ClientProfileTab: React.FC<ClientProfileTabProps> = ({
   session,
   lastBooking,
   localBookings,
+  isDemoMode = false,
   onOpenAuthSheet,
   onOpenInstallModal,
   onStartBooking,
@@ -152,10 +154,26 @@ export const ClientProfileTab: React.FC<ClientProfileTabProps> = ({
   );
 
   useEffect(() => {
+    if (isDemoMode) {
+      const demoLocal: CitaClienteRecord[] = localBookings
+        .filter((b) => b.negocioId === rubro.negocio_id)
+        .map((b) => ({
+          id: b.id,
+          cliente: b.cliente,
+          telefono: b.telefono,
+          servicio: b.servicio,
+          inicio: `${b.fecha}T${b.hora}:00-05:00`,
+          estado: b.estado,
+        }));
+      setCitasList(demoLocal);
+      setSearched(true);
+      return;
+    }
+
     if (session.role === 'client' && session.telefono.length === 9) {
       consultarHistorial(session.telefono);
     }
-  }, [session.role, session.telefono, consultarHistorial]);
+  }, [isDemoMode, localBookings, rubro.negocio_id, session.role, session.telefono, consultarHistorial]);
 
   const handleQuickLookup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,8 +209,69 @@ export const ClientProfileTab: React.FC<ClientProfileTabProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Tarjeta de identidad del usuario */}
-      {session.role === 'client' ? (
+      {/* Tarjeta de identidad / Mis Citas */}
+      {isDemoMode ? (
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3.5">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white"
+                style={{ backgroundColor: rubro.colores.primario }}
+              >
+                <Calendar className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <p
+                  className="text-xs font-bold"
+                  style={{ color: rubro.colores.primario }}
+                >
+                  Demo interactiva · Sin registro
+                </p>
+                <h2 className="text-lg font-bold text-slate-900">
+                  Tus citas y recordatorios
+                </h2>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={onStartBooking}
+              style={{ backgroundColor: rubro.colores.primario }}
+              className="tap-feedback inline-flex min-h-[42px] items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-bold text-white shadow-xs whitespace-nowrap"
+            >
+              <CalendarPlus className="h-4 w-4" />
+              Nueva cita
+            </button>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-1.5 rounded-2xl bg-slate-100 p-1">
+            <button
+              type="button"
+              onClick={() => setSubTab('historial')}
+              className={`tap-feedback flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-colors ${
+                subTab === 'historial'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Calendar className="h-4 w-4" />
+              Mis citas ({citasList.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setSubTab('recordatorios')}
+              className={`tap-feedback flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-colors ${
+                subTab === 'recordatorios'
+                  ? 'bg-white text-slate-900 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Bell className="h-4 w-4" />
+              Recordatorios
+            </button>
+          </div>
+        </section>
+      ) : session.role === 'client' ? (
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3.5">
@@ -284,30 +363,32 @@ export const ClientProfileTab: React.FC<ClientProfileTabProps> = ({
                 Regístrate solo con tu <strong>teléfono, nombre y ciudad</strong> o inicia sesión con tu celular para ver tus citas pasadas y tus recordatorios automáticos de WhatsApp.
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => onOpenAuthSheet('register')}
-                  style={{ backgroundColor: rubro.colores.primario }}
-                  className="tap-feedback min-h-[46px] rounded-xl px-4 text-xs font-bold text-white shadow-xs"
-                >
-                  Registrarme (Teléfono, Nombre, Ciudad)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onOpenAuthSheet('login')}
-                  className="tap-feedback min-h-[46px] rounded-xl border border-slate-200 bg-slate-50 px-4 text-xs font-bold text-slate-800 hover:bg-slate-100"
-                >
-                  Ya tengo perfil
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onOpenAuthSheet('owner')}
-                  className="tap-feedback min-h-[46px] rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  Acceso Dueño / CRM
-                </button>
-              </div>
+              {onOpenAuthSheet && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onOpenAuthSheet('register')}
+                    style={{ backgroundColor: rubro.colores.primario }}
+                    className="tap-feedback min-h-[46px] rounded-xl px-4 text-xs font-bold text-white shadow-xs"
+                  >
+                    Registrarme (Teléfono, Nombre, Ciudad)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onOpenAuthSheet('login')}
+                    className="tap-feedback min-h-[46px] rounded-xl border border-slate-200 bg-slate-50 px-4 text-xs font-bold text-slate-800 hover:bg-slate-100"
+                  >
+                    Ya tengo perfil
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onOpenAuthSheet('owner')}
+                    className="tap-feedback min-h-[46px] rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    Acceso Dueño / CRM
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -355,7 +436,7 @@ export const ClientProfileTab: React.FC<ClientProfileTabProps> = ({
       )}
 
       {/* Contenido Sub-Tab: HISTORIAL DE CITAS */}
-      {(subTab === 'historial' || session.role === 'guest') && (
+      {(subTab === 'historial' || (!isDemoMode && session.role === 'guest')) && (
         <section aria-label="Historial de citas" className="space-y-3">
           {loading ? (
             <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-500">

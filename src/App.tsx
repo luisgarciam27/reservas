@@ -158,9 +158,12 @@ export default function App() {
 
       {route.view === 'auth' && (
         <AuthPage
+          key={`${route.mode}-${preselectedPlan}`}
           initialMode={route.mode}
+          initialPlan={preselectedPlan}
           onBack={() => navigate({ view: 'landing' }, '/')}
           onAuthenticated={handleAuthenticated}
+          onViewDemo={() => navigate({ view: 'demo' }, '/demo')}
         />
       )}
 

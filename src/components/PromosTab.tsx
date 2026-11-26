@@ -128,121 +128,124 @@ export const PromosTab: React.FC<PromosTabProps> = ({
 
       {/* Banner de Oferta Flash Activa (Visible para Clientes) */}
       {flashActive && (
-        <div className="rounded-3xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 p-6 text-white shadow-xl relative overflow-hidden">
+        <div className="rounded-3xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 p-5 text-white shadow-lg relative overflow-hidden">
           <div className="absolute right-[-20px] bottom-[-20px] opacity-20 pointer-events-none">
-            <Zap className="w-48 h-48" />
+            <Zap className="w-40 h-40" />
           </div>
-          <div className="relative z-10 max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/25 px-3.5 py-1 text-xs font-extrabold text-white backdrop-blur-md mb-2">
-              <Zap className="h-3.5 w-3.5 text-amber-200" /> OFERTA FLASH · {flashDiscount}
+          <div className="relative z-10 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/25 px-3 py-1 text-xs font-extrabold text-white backdrop-blur-md">
+                <Zap className="h-3.5 w-3.5 text-amber-200" /> OFERTA FLASH · {flashDiscount}
+              </span>
+              <h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl">
+                Cupos hoy ({flashSlot})
+              </h2>
+            </div>
+            <span className="text-xs font-bold text-white/90 sm:text-right">
+              Descuento aplicado al elegir horario
             </span>
-            <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
-              ¡Descuento especial por horarios valle ({flashSlot})!
-            </h2>
-            <p className="mt-2 text-xs sm:text-sm text-white/90 leading-relaxed">
-              El negocio ha liberado cupos de última hora con <strong>{flashDiscount} de descuento</strong>. Selecciona cualquier servicio y aprovecha la tarifa reducida antes de que se agoten.
-            </p>
           </div>
         </div>
       )}
 
-      {/* Cabecera de Promociones Regulares */}
-      <div
-        className="rounded-3xl border p-6 text-white shadow-lg relative overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, ${rubro.colores.primario}, #0F172A)`,
-        }}
-      >
-        <div className="absolute -right-10 -bottom-10 opacity-15 pointer-events-none">
-          <Gift className="w-48 h-48" />
-        </div>
-        <div className="relative z-10 max-w-xl">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold text-white backdrop-blur-md mb-3">
-            <Sparkles className="h-3.5 w-3.5 text-amber-300" /> Campañas Activas en {rubro.ciudad}
-          </span>
-          <h2 className="text-2xl font-extrabold sm:text-3xl">Promociones y Descuentos Especiales</h2>
-          <p className="mt-2 text-xs sm:text-sm text-slate-200 leading-relaxed">
-            Aprovecha nuestros paquetes especiales y tarifas reducidas por tiempo limitado. Reserva en 1 toque y asegura tu descuento.
-          </p>
-        </div>
-      </div>
-
-      {/* Lista de Promociones */}
+      {/* Lista de Promociones Visuales */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {(rubro.promos || []).map((promo) => {
           const promoCode = `MARIA-${promo.id.toUpperCase()}`;
           const isCopied = copiedId === promo.id;
+          const matchingService =
+            rubro.servicios.find((s) => s.id === promo.servicioId) ||
+            rubro.servicios[0];
 
           const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(
-            `¡Hola! Te comparto esta promo imperdible en ${rubro.nombre}: *${promo.titulo}* (${promo.descuentoBadge}). Precio especial S/ ${promo.precioPromo}. ¡Reserva aquí desde MarIA!`
+            `¡Hola! Te comparto esta promo en ${rubro.nombre}: *${promo.titulo}* (${promo.descuentoBadge}). Precio especial S/ ${promo.precioPromo}.`
           )}`;
 
           return (
             <div
               key={promo.id}
-              className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs transition-all hover:shadow-md relative overflow-hidden"
+              className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md relative"
             >
-              <div className="absolute top-0 right-0 bg-rose-600 text-white font-black text-xs px-4 py-1.5 rounded-bl-2xl shadow-sm tracking-wider">
-                {flashActive ? `🔥 ${flashDiscount} Flash` : promo.descuentoBadge}
-              </div>
-
-              <div>
-                <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1 mb-1">
-                  <Tag className="h-3.5 w-3.5" /> Vigente hasta {promo.vigencia}
+              {/* Imagen visual de la promo */}
+              <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+                <img
+                  src={matchingService?.imagen || rubro.heroImage}
+                  alt={promo.titulo}
+                  referrerPolicy="no-referrer"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute top-0 right-0 bg-rose-600 text-white font-black text-xs px-3.5 py-1.5 rounded-bl-2xl shadow-sm tracking-wider">
+                  {flashActive ? `${flashDiscount} Flash` : promo.descuentoBadge}
+                </div>
+                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-xl bg-white/95 px-2.5 py-1 text-[11px] font-bold text-slate-800 shadow-xs backdrop-blur-xs">
+                  <Tag
+                    className="h-3 w-3"
+                    style={{ color: rubro.colores.primario }}
+                  />
+                  {promo.vigencia}
                 </span>
-                <h3 className="text-lg font-bold text-slate-900 mt-1">{promo.titulo}</h3>
-                <p className="mt-2 text-xs text-slate-600 leading-relaxed">{promo.descripcion}</p>
-
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-2xl font-black text-slate-900">
-                    S/ {flashActive ? Math.round(promo.precioPromo * 0.85) : promo.precioPromo}
-                  </span>
-                  <span className="text-sm font-medium text-slate-400 line-through">S/ {promo.precioRegular}</span>
-                  <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg ml-auto">
-                    {flashActive ? `¡Ahorro Flash extra!` : `Ahorras S/ ${promo.precioRegular - promo.precioPromo}`}
-                  </span>
-                </div>
               </div>
 
-              <div className="mt-6 border-t border-slate-100 pt-4 flex flex-col gap-2.5">
-                <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-2xl">
-                  <span className="text-xs font-mono font-bold text-slate-700">{promoCode}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleCopyCode(promoCode, promo.id)}
-                    className="tap-feedback inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800"
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="h-3.5 w-3.5 text-emerald-600" /> <span className="text-emerald-600">¡Copiado!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" /> Copiar código
-                      </>
-                    )}
-                  </button>
+              <div className="flex flex-1 flex-col justify-between p-5">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 leading-snug">
+                    {promo.titulo}
+                  </h3>
+
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-slate-900 tabular-nums">
+                      S/ {flashActive ? Math.round(promo.precioPromo * 0.85) : promo.precioPromo}
+                    </span>
+                    <span className="text-sm font-medium text-slate-400 line-through tabular-nums">
+                      S/ {promo.precioRegular}
+                    </span>
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg ml-auto">
+                      Ahorras S/ {promo.precioRegular - (flashActive ? Math.round(promo.precioPromo * 0.85) : promo.precioPromo)}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => handleApplyPromo(promo)}
-                    className="tap-feedback inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-bold text-white shadow-md transition-transform hover:scale-[1.02]"
-                    style={{ backgroundColor: rubro.colores.primario }}
-                  >
-                    <span>Reservar con promo</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
+                <div className="mt-4 border-t border-slate-100 pt-3.5 flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                    <span className="text-xs font-mono font-bold text-slate-700">{promoCode}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCode(promoCode, promo.id)}
+                      className="tap-feedback inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800"
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="h-3.5 w-3.5 text-emerald-600" />{' '}
+                          <span className="text-emerald-600">¡Copiado!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" /> Copiar
+                        </>
+                      )}
+                    </button>
+                  </div>
 
-                  <a
-                    href={whatsappShareUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="tap-feedback inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 text-xs font-bold text-emerald-800 hover:bg-emerald-100"
-                  >
-                    <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" /> Compartir
-                  </a>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleApplyPromo(promo)}
+                      className="tap-feedback inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-bold text-white shadow-sm transition-transform hover:scale-[1.02]"
+                      style={{ backgroundColor: rubro.colores.primario }}
+                    >
+                      <span>Elegir horario</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+
+                    <a
+                      href={whatsappShareUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="tap-feedback inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 text-xs font-bold text-emerald-800 hover:bg-emerald-100"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" /> Compartir
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

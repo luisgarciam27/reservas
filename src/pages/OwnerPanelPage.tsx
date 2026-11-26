@@ -171,6 +171,12 @@ export const OwnerPanelPage: React.FC<OwnerPanelPageProps> = ({
     }
   }, [fullPublicUrl]);
 
+  useEffect(() => {
+    if (typeof document !== 'undefined' && negocio.color) {
+      document.documentElement.style.setProperty('--primary-color', negocio.color);
+    }
+  }, [negocio.color]);
+
   const handleShareWhatsApp = () => {
     const text = `¡Hola! Ya puedes agendar tu cita en ${negocio.nombre} directo desde nuestra App oficial 24/7:\n${fullPublicUrl}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');

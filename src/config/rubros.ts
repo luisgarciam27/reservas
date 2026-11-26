@@ -9,6 +9,12 @@
 import heroConsultorioImg from '../assets/images/hero_consultorio_dental_1794591301986.jpg';
 import heroSalonImg from '../assets/images/hero_salon_spa_1794591301304.jpg';
 import heroVeterinariaImg from '../assets/images/hero_veterinaria_1794591302304.jpg';
+import dentalCleaningSmileImg from '../assets/images/dental_cleaning_smile_1795557999618.jpg';
+import dentalWhiteningCareImg from '../assets/images/dental_whitening_care_1795558000258.jpg';
+import salonHairStylingImg from '../assets/images/salon_hair_styling_1795558001809.jpg';
+import salonManicureFacialImg from '../assets/images/salon_manicure_facial_1795558001924.jpg';
+import vetPetGroomingImg from '../assets/images/vet_pet_grooming_1795558001798.jpg';
+import vetCheckupCareImg from '../assets/images/vet_checkup_care_1795558002442.jpg';
 
 // ----------------------------------------------------------------------------
 // CREDENCIALES PÚBLICAS DE SUPABASE (NUNCA uses la service_role key aquí)
@@ -37,6 +43,7 @@ export interface ServicioItem {
   nombre: string;
   duracion: string;
   precio: number;
+  imagen?: string;
   descripcion: string;
   incluye: string[];
   recomendacion: string;
@@ -162,36 +169,35 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
       horaFin: 19,
     },
     landing: {
-      titularHero: 'Cuida tu salud dental con atención puntual y sin filas',
-      subtituloHero:
-        'Revisa nuestros tratamientos, conoce las tarifas transparentes en Soles y agenda tu turno en menos de un minuto con confirmación por WhatsApp.',
+      titularHero: 'Tu sonrisa al día, puntual y sin esperas',
+      subtituloHero: 'Elige tu tratamiento, mira horarios en vivo y agenda en segundos.',
       beneficios: [
         {
           titulo: 'Especialistas colegiados',
-          detalle: 'Odontólogos con experiencia en atención familiar y estética.',
+          detalle: 'Atención familiar y estética.',
         },
         {
-          titulo: 'Bioseguridad garantizada',
-          detalle: 'Instrumental esterilizado y equipamiento clínico moderno.',
+          titulo: 'Bioseguridad total',
+          detalle: 'Equipos modernos y esterilizados.',
         },
         {
-          titulo: 'Cero tiempo perdido',
-          detalle: 'Tu turno reservado se respeta y te avisamos por WhatsApp.',
+          titulo: 'Aviso por WhatsApp',
+          detalle: 'Recordatorio automático de tu cita.',
         },
       ],
       ctaPrincipal: 'Reservar cita',
     },
     colores: {
-      primario: '#0369A1', // Azul clínico serio
-      primarioHover: '#075985',
+      primario: '#0284C7', // Azul cielo clínico vibrante
+      primarioHover: '#0369A1',
       primarioTexto: '#FFFFFF',
-      acento: '#0EA5E9',
+      acento: '#06B6D4',
       fondoSuave: '#F0F9FF',
-      bordeSuave: '#BAE6FD',
+      bordeSuave: '#7DD3FC',
       superficieDestacada: '#E0F2FE',
-      chipActivoBg: '#0369A1',
+      chipActivoBg: '#0284C7',
       chipActivoText: '#FFFFFF',
-      themeColorMeta: '#0369A1',
+      themeColorMeta: '#0284C7',
     },
     tipografia: {
       esEditorialSerif: false,
@@ -202,8 +208,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Evaluación y Diagnóstico',
         duracion: '30 min',
         precio: 50,
-        descripcion:
-          'Revisión clínica completa para detectar caries, sensibilidad o desgaste a tiempo.',
+        imagen: dentalCleaningSmileImg,
+        descripcion: 'Revisión dental completa y plan claro al instante.',
         incluye: [
           'Odontograma completo pieza por pieza',
           'Revisión de encías y mordida',
@@ -216,8 +222,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Limpieza Dental (Profilaxis)',
         duracion: '45 min',
         precio: 90,
-        descripcion:
-          'Limpieza profunda indolora que elimina sarro y manchas superficiales.',
+        imagen: heroConsultorioImg,
+        descripcion: 'Ultrasonido indoloro que elimina sarro y manchas.',
         incluye: [
           'Destartraje con equipo de ultrasonido',
           'Pulido dental con pasta profiláctica',
@@ -230,8 +236,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Curación Estética con Resina',
         duracion: '45 min',
         precio: 110,
-        descripcion:
-          'Restauración del diente afectado con resina fotocurable del mismo tono natural.',
+        imagen: dentalCleaningSmileImg,
+        descripcion: 'Restauración natural del mismo tono de tu diente.',
         incluye: [
           'Anestesia local confortable si es necesario',
           'Remoción cuidadosa de caries',
@@ -244,8 +250,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Blanqueamiento LED',
         duracion: '60 min',
         precio: 240,
-        descripcion:
-          'Aclaramiento dental clínico en una sola sesión bajo supervisión odontológica.',
+        imagen: dentalWhiteningCareImg,
+        descripcion: 'Sonrisa más blanca en 1 sesión con luz LED clínica.',
         incluye: [
           'Protección gingival de encías',
           '3 ciclos de gel blanqueador con luz LED',
@@ -378,36 +384,35 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
       horaFin: 19,
     },
     landing: {
-      titularHero: 'Un espacio sereno para renovar tu estilo y bienestar',
-      subtituloHero:
-        'Explora nuestros tratamientos capilares, manicure spa y cuidado facial con productos profesionales. Elige tu servicio y genera tu cita al instante.',
+      titularHero: 'Renueva tu look, uñas y piel en tu horario ideal',
+      subtituloHero: 'Cabello, manicure gel y faciales spa listos para reservar.',
       beneficios: [
         {
-          titulo: 'Asesoría personalizada',
-          detalle: 'Evaluamos tu tipo de cabello y piel antes de cada sesión.',
+          titulo: 'Estilistas expertos',
+          detalle: 'Diseño acorde a tu rostro.',
         },
         {
-          titulo: 'Insumos de alta gama',
-          detalle: 'Fórmulas libres de formol y esmaltes de larga duración.',
+          titulo: 'Productos premium',
+          detalle: 'Fórmulas sin formol y gel UV.',
         },
         {
-          titulo: 'Recordatorio por WhatsApp',
-          detalle: 'Confirma o reprograma con un toque desde tu celular.',
+          titulo: 'Confirmación rápida',
+          detalle: 'Recordatorio directo a tu WhatsApp.',
         },
       ],
       ctaPrincipal: 'Reservar cita',
     },
     colores: {
-      primario: '#9D4E65', // Rosa empolvado elegante
-      primarioHover: '#833D52',
+      primario: '#DB2777', // Rosa vibrante elegante
+      primarioHover: '#BE185D',
       primarioTexto: '#FFFFFF',
-      acento: '#B88A36', // Dorado refinado
-      fondoSuave: '#FDF7F8',
-      bordeSuave: '#F2D8DF',
-      superficieDestacada: '#F9ECEF',
-      chipActivoBg: '#9D4E65',
+      acento: '#F59E0B', // Dorado luminoso
+      fondoSuave: '#FFF1F6',
+      bordeSuave: '#FBCFE8',
+      superficieDestacada: '#FCE7F3',
+      chipActivoBg: '#DB2777',
       chipActivoText: '#FFFFFF',
-      themeColorMeta: '#9D4E65',
+      themeColorMeta: '#DB2777',
     },
     tipografia: {
       esEditorialSerif: true,
@@ -418,8 +423,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Corte & Brushing Estilizado',
         duracion: '45 min',
         precio: 65,
-        descripcion:
-          'Diseño de corte según tus facciones acompañado de lavado hidratante y brushing duradero.',
+        imagen: salonHairStylingImg,
+        descripcion: 'Corte personalizado, lavado nutritivo y ondas duraderas.',
         incluye: [
           'Diagnóstico de rostro y textura capilar',
           'Lavado nutritivo con masaje craneal',
@@ -432,8 +437,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Manicure Spa + Gel',
         duracion: '60 min',
         precio: 75,
-        descripcion:
-          'Cuidado integral de manos y uñas con esmaltado en gel de brillo intacto hasta 21 días.',
+        imagen: salonManicureFacialImg,
+        descripcion: 'Exfoliación de manos y esmaltado gel brillo espejo.',
         incluye: [
           'Limado, retiro suave y cuidado de cutícula',
           'Exfoliación e hidratación de manos',
@@ -446,8 +451,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Botox Capilar & Keratina',
         duracion: '90 min',
         precio: 160,
-        descripcion:
-          'Tratamiento intensivo que controla el frizz, repara la fibra y devuelve brillo espejo.',
+        imagen: heroSalonImg,
+        descripcion: 'Cero frizz, reparación profunda y brillo sedoso.',
         incluye: [
           'Lavado purificante preparatorio',
           'Aplicación de keratina orgánica sin formol',
@@ -460,8 +465,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Limpieza Facial Hidratante',
         duracion: '60 min',
         precio: 110,
-        descripcion:
-          'Protocolo calmante para limpiar poros, equilibrar la piel y devolver luminosidad.',
+        imagen: salonManicureFacialImg,
+        descripcion: 'Piel limpia, luminosa e hidratada con masaje spa.',
         incluye: [
           'Higiene facial y vaporización suave',
           'Extracción delicada de impurezas',
@@ -566,36 +571,35 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
       horaFin: 19,
     },
     landing: {
-      titularHero: 'Atención veterinaria cercana, sin estrés para tu mascota',
-      subtituloHero:
-        'Conoce nuestros servicios médicos, vacunas y baño medicado con precios claros. Reserva su turno para evitar largas esperas en sala.',
+      titularHero: 'Cuidado veterinario y spa sin estrés para tu engreído',
+      subtituloHero: 'Consultas, vacunas y baño medicado por turnos sin espera.',
       beneficios: [
         {
-          titulo: 'Manejo respetuoso',
-          detalle: 'Atención paciente adaptada a perros, gatos y mascotas exóticas.',
+          titulo: 'Trato sin estrés',
+          detalle: 'Turnos exclusivos para perros y gatos.',
         },
         {
-          titulo: 'Control de historial',
-          detalle: 'Llevamos ficha clínica y seguimiento de vacunas al día.',
+          titulo: 'Historial al día',
+          detalle: 'Control de vacunas y peso.',
         },
         {
-          titulo: 'Recordatorio personalizado',
-          detalle: 'Te escribimos por WhatsApp con el nombre de tu engreído.',
+          titulo: 'Aviso por WhatsApp',
+          detalle: 'Te recordamos con su nombre.',
         },
       ],
       ctaPrincipal: 'Reservar cita',
     },
     colores: {
-      primario: '#15803D', // Verde bosque cálido
-      primarioHover: '#166534',
+      primario: '#059669', // Esmeralda fresco y vivo
+      primarioHover: '#047857',
       primarioTexto: '#FFFFFF',
-      acento: '#D97706', // Ámbar cálido
-      fondoSuave: '#F3FAF5',
-      bordeSuave: '#BBF7D0',
-      superficieDestacada: '#DCFCE7',
-      chipActivoBg: '#15803D',
+      acento: '#F59E0B', // Ámbar cálido
+      fondoSuave: '#ECFDF5',
+      bordeSuave: '#6EE7B7',
+      superficieDestacada: '#D1FAE5',
+      chipActivoBg: '#059669',
       chipActivoText: '#FFFFFF',
-      themeColorMeta: '#15803D',
+      themeColorMeta: '#059669',
     },
     tipografia: {
       esEditorialSerif: false,
@@ -606,8 +610,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Consulta Veterinaria General',
         duracion: '30 min',
         precio: 45,
-        descripcion:
-          'Evaluación física integral para diagnosticar malestares o realizar control preventivo.',
+        imagen: vetCheckupCareImg,
+        descripcion: 'Chequeo médico completo para perros y gatos.',
         incluye: [
           'Control de peso, temperatura y auscultación',
           'Revisión de piel, oídos y mucosas',
@@ -620,8 +624,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Vacunación y Desparasitación',
         duracion: '30 min',
         precio: 60,
-        descripcion:
-          'Protección inmunológica para cachorros, perros adultos y gatos con registro oficial.',
+        imagen: heroVeterinariaImg,
+        descripcion: 'Protección inmunológica y registro sanitario al día.',
         incluye: [
           'Chequeo físico previo a la aplicación',
           'Dosis de vacuna o antiparasitario según peso',
@@ -634,8 +638,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Baño Medicado & Grooming',
         duracion: '60 min',
         precio: 55,
-        descripcion:
-          'Higiene relajante con agua temperada y productos dermatológicos seguros.',
+        imagen: vetPetGroomingImg,
+        descripcion: 'Agua temperada, corte de uñas y secado silencioso.',
         incluye: [
           'Baño con shampoo medicado o hipoalergénico',
           'Secado silencioso, corte de uñas y limpieza de oídos',
@@ -648,8 +652,8 @@ export const RUBROS: Record<RubroKey, RubroConfig> = {
         nombre: 'Ecografía y Chequeo Preventivo',
         duracion: '45 min',
         precio: 120,
-        descripcion:
-          'Estudio de diagnóstico por imágenes rápido, no invasivo y sin sedación.',
+        imagen: vetCheckupCareImg,
+        descripcion: 'Diagnóstico por imágenes rápido, indoloro y sin sedación.',
         incluye: [
           'Evaluación abdominal completa',
           'Informe veterinario detallado',

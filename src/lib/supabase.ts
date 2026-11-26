@@ -106,21 +106,28 @@ function normalizeHourFromRpc(entry: unknown): string | null {
  */
 export async function fetchHorasOcupadas(
   negocioId: string,
-  fecha: string
+  fecha: string,
+  isDemoMode = false
 ): Promise<{ horas: string[]; isPreviewMode: boolean }> {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
     throw new OfflineBookingError();
   }
 
-  // Si aún no se colocan las constantes reales de Supabase, permite probar el flujo en vista previa
-  if (!isSupabaseConfigured) {
-    await new Promise((r) => setTimeout(r, 220));
+  const getLocalSlotsResult = () => {
     const key = getPreviewSlotKey(negocioId, fecha);
     const localSet = previewBookedSlots.get(key);
-    // Simulamos un par de turnos base ocupados para mostrar el estado visualmente
     const baseBusy = ['10:00', '16:00'];
-    const merged = new Set<string>([...baseBusy, ...(localSet ? Array.from(localSet) : [])]);
+    const merged = new Set<string>([
+      ...baseBusy,
+      ...(localSet ? Array.from(localSet) : []),
+    ]);
     return { horas: Array.from(merged), isPreviewMode: true };
+  };
+
+  // En modo demo o sin llaves reales de Supabase, usa la agenda de demostración local
+  if (isDemoMode || !isSupabaseConfigured) {
+    await new Promise((r) => setTimeout(r, 180));
+    return getLocalSlotsResult();
   }
 
   try {
@@ -160,6 +167,7 @@ export interface CrearCitaPayload {
   fecha: string; // YYYY-MM-DD
   hora: string; // HH:00
   negocio_id: string;
+  isDemoMode?: boolean;
 }
 
 /**
@@ -177,8 +185,7 @@ export async function crearCita(
   // Perú (America/Lima) no utiliza horario de verano; su desfase fijo es -05:00
   const inicio = `${payload.fecha}T${payload.hora}:00-05:00`;
 
-  if (!isSupabaseConfigured) {
-    await new Promise((r) => setTimeout(r, 320));
+  const saveLocalDemoSlot = () => {
     const key = getPreviewSlotKey(payload.negocio_id, payload.fecha);
     const localSet = previewBookedSlots.get(key) ?? new Set<string>();
     if (localSet.has(payload.hora) || payload.hora === '10:00' || payload.hora === '16:00') {
@@ -187,6 +194,11 @@ export async function crearCita(
     localSet.add(payload.hora);
     previewBookedSlots.set(key, localSet);
     return { isPreviewMode: true, inicio };
+  };
+
+  if (payload.isDemoMode || !isSupabaseConfigured) {
+    await new Promise((r) => setTimeout(r, 260));
+    return saveLocalDemoSlot();
   }
 
   try {

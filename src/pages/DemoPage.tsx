@@ -3,27 +3,19 @@ import {
   ArrowLeft,
   ArrowLeftRight,
   Briefcase,
+  CalendarCheck2,
   CalendarPlus,
-  Download,
   Gift,
   Home,
   MapPin,
   Sparkles,
-  User,
 } from 'lucide-react';
-import { AuthSheet } from '../components/AuthSheet';
 import { BookingTab, type BookedSummary } from '../components/BookingTab';
 import { BusinessLanding } from '../components/BusinessLanding';
-import { BusinessWelcomeSheet } from '../components/BusinessWelcomeSheet';
 import { ClientProfileTab } from '../components/ClientProfileTab';
 import { OwnerDashboard } from '../components/owner/OwnerDashboard';
 import { PromosTab } from '../components/PromosTab';
-import {
-  OfflineNoticeInline,
-  PWAInstallBanner,
-} from '../components/PWABanners';
-import { PWAInstallModal } from '../components/PWAInstallModal';
-import { WhatsAppSvgIcon } from '../components/RubroIcons';
+import { OfflineNoticeInline } from '../components/PWABanners';
 import { RubroSelector } from '../components/RubroSelector';
 import {
   RUBROS,
@@ -39,19 +31,15 @@ const LOCAL_BOOKINGS_KEY = 'maria_local_bookings_v1';
 
 interface DemoPageProps {
   onBackToSaaSLanding: () => void;
-  onCreateAccount: () => void;
+  onCreateAccount?: () => void;
 }
 
 export const DemoPage: React.FC<DemoPageProps> = ({
   onBackToSaaSLanding,
-  onCreateAccount,
 }) => {
   const {
     session,
     registerClient,
-    loginClientByPhone,
-    loginAsOwner,
-    continueAsGuest,
     logout,
   } = useAuthSession();
 
@@ -63,13 +51,6 @@ export const DemoPage: React.FC<DemoPageProps> = ({
     useState<ServicioItem | null>(null);
   const [lastBooking, setLastBooking] = useState<BookedSummary | null>(null);
   const [ownerPreviewClient, setOwnerPreviewClient] = useState<boolean>(false);
-
-  const [installModalOpen, setInstallModalOpen] = useState<boolean>(false);
-  const [welcomeSheetOpen, setWelcomeSheetOpen] = useState<boolean>(false);
-  const [authSheetOpen, setAuthSheetOpen] = useState<boolean>(false);
-  const [authInitialMode, setAuthInitialMode] = useState<
-    'register' | 'login' | 'owner'
-  >('register');
 
   const [localBookings, setLocalBookings] = useState<AppointmentRecord[]>(() => {
     try {
@@ -118,21 +99,11 @@ export const DemoPage: React.FC<DemoPageProps> = ({
     }
   }, [rubro]);
 
-  const handleOpenAuthSheet = (
-    mode: 'register' | 'login' | 'owner' = 'register'
-  ) => {
-    setAuthInitialMode(mode);
-    setAuthSheetOpen(true);
-  };
-
   const handleSelectRubro = (key: RubroKey) => {
     setSelectedRubroKey(key);
     setClientTab('inicio');
     setOwnerPreviewClient(false);
     setPreselectedService(null);
-    if (session.role === 'guest') {
-      setWelcomeSheetOpen(true);
-    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -141,7 +112,6 @@ export const DemoPage: React.FC<DemoPageProps> = ({
     setClientTab('inicio');
     setOwnerPreviewClient(false);
     setPreselectedService(null);
-    setWelcomeSheetOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -186,14 +156,6 @@ export const DemoPage: React.FC<DemoPageProps> = ({
 
   const isOwnerActive = session.role === 'owner' && !ownerPreviewClient;
 
-  const whatsappUrl = rubro
-    ? `https://wa.me/${rubro.whatsapp}?text=${encodeURIComponent(
-        `Hola MarIA, consulto desde ${rubro.nombre}.`
-      )}`
-    : `https://wa.me/51964112233?text=${encodeURIComponent(
-        'Hola MarIA, probé el demo y quiero activar la App de citas para mi negocio.'
-      )}`;
-
   const CLIENT_TABS: {
     id: ClientTabKey;
     label: string;
@@ -204,8 +166,8 @@ export const DemoPage: React.FC<DemoPageProps> = ({
     { id: 'promos', label: 'Promos', icon: Gift },
     {
       id: 'perfil',
-      label: session.role === 'client' ? 'Mi Perfil' : 'Ingresar',
-      icon: User,
+      label: 'Mis Citas',
+      icon: CalendarCheck2,
     },
   ];
 
@@ -232,43 +194,23 @@ export const DemoPage: React.FC<DemoPageProps> = ({
             <span className="hidden sm:inline">Volver a MarIA Citas</span>
           </button>
           <span
-            className="hidden sm:inline font-medium"
-            style={{ color: 'var(--sub)' }}
-          >
-            Demo en vivo · Tu App de citas sin registro
-          </span>
-          <button
-            type="button"
-            onClick={onCreateAccount}
-            className="tap-feedback inline-flex min-h-[38px] items-center gap-1.5 rounded-[10px] px-3 font-medium whitespace-nowrap"
+            className="inline-flex min-h-[32px] items-center gap-1.5 rounded-[10px] px-3 font-medium whitespace-nowrap"
             style={{
-              backgroundColor: 'var(--p)',
-              color: 'var(--onp)',
+              backgroundColor: 'var(--cys)',
+              color: 'var(--cyt)',
             }}
           >
-            <Sparkles className="h-3.5 w-3.5 shrink-0" />
-            Crear mi cuenta
-          </button>
+            <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span>Demo libre · Reserva sin registro</span>
+          </span>
         </div>
       </div>
 
       {!rubro ? (
-        <>
-          <RubroSelector
-            session={session}
-            onSelectRubro={handleSelectRubro}
-            onOpenAuthSheet={handleOpenAuthSheet}
-          />
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Contactar a MarIA por WhatsApp"
-            className="tap-feedback fixed bottom-5 right-4 z-30 flex h-13 w-13 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-950/20 sm:bottom-6 sm:right-6"
-          >
-            <WhatsAppSvgIcon className="h-7 w-7" />
-          </a>
-        </>
+        <RubroSelector
+          session={session}
+          onSelectRubro={handleSelectRubro}
+        />
       ) : (
         <div
           className="min-h-[100dvh] flex flex-col transition-colors duration-300"
@@ -310,48 +252,13 @@ export const DemoPage: React.FC<DemoPageProps> = ({
                   </button>
                 )}
 
-                {!isOwnerActive && (
-                  <button
-                    type="button"
-                    onClick={() => setInstallModalOpen(true)}
-                    aria-label="Descargar App al móvil"
-                    className="tap-feedback inline-flex min-h-[38px] items-center gap-1 rounded-xl border border-indigo-200 bg-indigo-50 px-2.5 text-xs font-bold text-indigo-800 hover:bg-indigo-100 whitespace-nowrap"
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Descargar App</span>
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleOpenAuthSheet(
-                      session.role === 'owner'
-                        ? 'owner'
-                        : session.role === 'client'
-                          ? 'login'
-                          : 'register'
-                    )
-                  }
-                  className="tap-feedback inline-flex min-h-[38px] items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-50 whitespace-nowrap"
-                >
-                  <User className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">
-                    {session.role === 'owner'
-                      ? 'Dueño'
-                      : session.role === 'client'
-                        ? session.nombre.split(' ')[0]
-                        : 'Rol'}
-                  </span>
-                </button>
-
                 <button
                   type="button"
                   onClick={handleChangeRubro}
                   className="tap-feedback inline-flex min-h-[38px] shrink-0 items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2.5 text-xs font-semibold text-slate-800 hover:bg-slate-100 whitespace-nowrap"
                 >
                   <ArrowLeftRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span className="hidden sm:inline">Rubros</span>
+                  <span>Rubros</span>
                 </button>
               </div>
             </div>
@@ -454,9 +361,9 @@ export const DemoPage: React.FC<DemoPageProps> = ({
                       rubro={rubro}
                       userRole={session.role}
                       userName={session.nombre}
+                      isDemoMode={true}
                       onStartBooking={handleStartBooking}
-                      onOpenInstallModal={() => setInstallModalOpen(true)}
-                      onOpenAuthSheet={handleOpenAuthSheet}
+                      onOpenInstallModal={() => undefined}
                     />
                   )}
 
@@ -465,11 +372,11 @@ export const DemoPage: React.FC<DemoPageProps> = ({
                       rubro={rubro}
                       session={session}
                       initialService={preselectedService}
+                      isDemoMode={true}
                       onBackToLanding={() => handleClientTabChange('inicio')}
                       onBookingCreated={handleBookingCreated}
                       onRegisterClient={registerClient}
-                      onOpenInstallModal={() => setInstallModalOpen(true)}
-                      onOpenAuthSheet={handleOpenAuthSheet}
+                      onOpenInstallModal={() => undefined}
                       onGoToProfile={() => handleClientTabChange('perfil')}
                     />
                   )}
@@ -488,16 +395,12 @@ export const DemoPage: React.FC<DemoPageProps> = ({
                       session={session}
                       lastBooking={lastBooking}
                       localBookings={localBookings}
-                      onOpenAuthSheet={handleOpenAuthSheet}
-                      onOpenInstallModal={() => setInstallModalOpen(true)}
+                      isDemoMode={true}
+                      onOpenInstallModal={() => undefined}
                       onStartBooking={() => handleStartBooking()}
                       onLogout={logout}
                     />
                   )}
-                </div>
-
-                <div className="mt-6">
-                  <PWAInstallBanner accentColor={rubro.colores.primario} />
                 </div>
 
                 <nav
@@ -537,79 +440,8 @@ export const DemoPage: React.FC<DemoPageProps> = ({
               Desarrollado con pasión, Perú 🇵🇪.
             </footer>
           </main>
-
-          {!isOwnerActive && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Hablar por WhatsApp"
-              className="tap-feedback fixed bottom-20 right-4 z-30 flex h-13 w-13 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-950/25 md:bottom-6 md:right-6"
-            >
-              <WhatsAppSvgIcon className="h-7 w-7" />
-            </a>
-          )}
         </div>
       )}
-
-      {rubro && (
-        <BusinessWelcomeSheet
-          key={rubro.id}
-          open={welcomeSheetOpen && session.role === 'guest'}
-          rubro={rubro}
-          onClose={() => setWelcomeSheetOpen(false)}
-          onRegisterAndContinue={(params) => {
-            registerClient(params);
-            setWelcomeSheetOpen(false);
-            setClientTab('reservar');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onBookAsGuest={() => {
-            continueAsGuest();
-            setWelcomeSheetOpen(false);
-            setClientTab('reservar');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenLogin={() => {
-            setWelcomeSheetOpen(false);
-            handleOpenAuthSheet('login');
-          }}
-          onOpenOwnerLogin={() => {
-            setWelcomeSheetOpen(false);
-            handleOpenAuthSheet('owner');
-          }}
-          onOpenInstallModal={() => {
-            setWelcomeSheetOpen(false);
-            setInstallModalOpen(true);
-          }}
-        />
-      )}
-
-      <PWAInstallModal
-        open={installModalOpen}
-        onClose={() => setInstallModalOpen(false)}
-        accentColor={rubro?.colores.primario || '#4F46E5'}
-      />
-
-      <AuthSheet
-        key={`${authSheetOpen}-${authInitialMode}`}
-        open={authSheetOpen}
-        onClose={() => setAuthSheetOpen(false)}
-        rubro={rubro}
-        session={session}
-        initialMode={authInitialMode}
-        onRegisterClient={registerClient}
-        onLoginClient={loginClientByPhone}
-        onLoginOwner={(params) => {
-          loginAsOwner(params);
-          setOwnerPreviewClient(false);
-          if (!selectedRubroKey) {
-            setSelectedRubroKey('consultorio');
-          }
-        }}
-        onContinueAsGuest={continueAsGuest}
-        onOpenInstallModal={() => setInstallModalOpen(true)}
-      />
     </>
   );
 };

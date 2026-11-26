@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
   ArrowLeft,
+  ArrowRight,
   Calendar,
   Check,
   CheckCircle2,
@@ -41,6 +42,7 @@ interface BookingTabProps {
   rubro: RubroConfig;
   session: UserSession;
   initialService?: ServicioItem | null;
+  isDemoMode?: boolean;
   onBackToLanding: () => void;
   onBookingCreated: (summary: BookedSummary) => void;
   onRegisterClient: (params: {
@@ -49,7 +51,7 @@ interface BookingTabProps {
     ciudad: string;
   }) => void;
   onOpenInstallModal: () => void;
-  onOpenAuthSheet: (mode?: 'register' | 'login' | 'owner') => void;
+  onOpenAuthSheet?: (mode?: 'register' | 'login' | 'owner') => void;
   onGoToProfile: () => void;
 }
 
@@ -108,6 +110,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
   rubro,
   session,
   initialService = null,
+  isDemoMode = false,
   onBackToLanding,
   onBookingCreated,
   onRegisterClient,
@@ -148,7 +151,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
     session.ciudad || 'Lima'
   );
   const [guardarComoRegistrado, setGuardarComoRegistrado] = useState<boolean>(
-    () => session.role === 'guest'
+    () => !isDemoMode && session.role === 'guest'
   );
   const [motivo, setMotivo] = useState<string>('');
   const [nombreMascota, setNombreMascota] = useState<string>('');
@@ -215,7 +218,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
     setIsOfflineSlotsError(false);
 
     try {
-      const result = await fetchHorasOcupadas(rubro.negocio_id, fecha);
+      const result = await fetchHorasOcupadas(rubro.negocio_id, fecha, isDemoMode);
       setHorasOcupadas(result.horas);
       setIsPreviewMode(result.isPreviewMode);
       // Si la hora elegida quedó ocupada, limpiarla
@@ -234,7 +237,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
     } finally {
       setLoadingSlots(false);
     }
-  }, [fecha, rubro.negocio_id]);
+  }, [fecha, rubro.negocio_id, isDemoMode]);
 
   useEffect(() => {
     if (step === 2 || step === 3) {
@@ -244,18 +247,19 @@ export const BookingTab: React.FC<BookingTabProps> = ({
 
   // Botones rápidos de fecha (omitiendo domingos)
   const quickDates = useMemo(() => {
-    const candidates: { label: string; ymd: string }[] = [];
+    const candidates: { label: string; subLabel: string; ymd: string }[] = [];
     let offset = 0;
     while (candidates.length < 3 && offset < 7) {
       const ymd = addDaysToYmd(todayYmd, offset);
       if (!isSundayYmd(ymd)) {
+        const subLabel = formatReadableDate(ymd);
         const label =
           offset === 0
             ? 'Hoy'
             : offset === 1
               ? 'Mañana'
-              : formatReadableDate(ymd);
-        candidates.push({ label, ymd });
+              : subLabel.split(',')[0] || 'Próximo día';
+        candidates.push({ label, subLabel, ymd });
       }
       offset += 1;
     }
@@ -329,6 +333,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
         fecha,
         hora,
         negocio_id: rubro.negocio_id,
+        isDemoMode,
       });
 
       setIsPreviewMode(res.isPreviewMode);
@@ -347,8 +352,8 @@ export const BookingTab: React.FC<BookingTabProps> = ({
         tipoMascota: rubro.id === 'veterinaria' ? tipoMascota : undefined,
       };
 
-      // Si el invitado marcó guardar perfil o si ya es cliente, actualizar registro con teléfono, nombre y ciudad
-      if (session.role === 'guest' && guardarComoRegistrado) {
+      // Si no es demo y el invitado marcó guardar perfil, actualizar registro con teléfono, nombre y ciudad
+      if (!isDemoMode && session.role === 'guest' && guardarComoRegistrado) {
         onRegisterClient({
           telefono: celular.trim(),
           nombre: nombre.trim(),
@@ -358,6 +363,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
 
       setConfirmedBooking(summary);
       onBookingCreated(summary);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       if (err instanceof OfflineBookingError || !navigator.onLine) {
         setIsOfflineSubmitError(true);
@@ -410,19 +416,24 @@ export const BookingTab: React.FC<BookingTabProps> = ({
             <CheckCircle2 className="h-9 w-9" aria-hidden="true" />
           </motion.div>
 
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-xs font-bold text-emerald-700">
+            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            Reserva confirmada
+          </div>
+
           <h2
-            className={`mt-4 text-2xl font-bold text-slate-900 ${
+            className={`mt-2.5 text-2xl font-bold text-slate-900 ${
               rubro.tipografia.esEditorialSerif ? 'font-display-serif text-3xl' : ''
             }`}
           >
-            ¡Cita reservada con éxito!
+            ¡Su cita ha sido registrada con éxito!
           </h2>
           <p className="mt-1.5 text-sm text-slate-600">
-            Enviaremos un recordatorio automático al{' '}
+            Enviaremos su recordatorio automático al{' '}
             <span className="font-semibold text-slate-900 tabular-nums">
-              {confirmedBooking.telefono}
+              +51 {confirmedBooking.telefono}
             </span>{' '}
-            antes de tu cita.
+            antes de la atención.
           </p>
 
           <div className="mt-5 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left text-sm">
@@ -469,16 +480,20 @@ export const BookingTab: React.FC<BookingTabProps> = ({
               className="tap-feedback flex min-h-[50px] w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold text-white shadow-xs"
             >
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              Ver Mi Perfil y Recordatorios
+              {isDemoMode
+                ? 'Ver Mi Cita y Recordatorios'
+                : 'Ver Mi Perfil y Recordatorios'}
             </button>
-            <button
-              type="button"
-              onClick={onOpenInstallModal}
-              className="tap-feedback flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 text-sm font-semibold text-indigo-800 hover:bg-indigo-100"
-            >
-              <Download className="h-4 w-4" aria-hidden="true" />
-              Descargar App al móvil
-            </button>
+            {!isDemoMode && (
+              <button
+                type="button"
+                onClick={onOpenInstallModal}
+                className="tap-feedback flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 text-sm font-semibold text-indigo-800 hover:bg-indigo-100"
+              >
+                <Download className="h-4 w-4" aria-hidden="true" />
+                Descargar App al móvil
+              </button>
+            )}
             <button
               type="button"
               onClick={handleResetFlow}
@@ -504,59 +519,64 @@ export const BookingTab: React.FC<BookingTabProps> = ({
           Volver al inicio
         </button>
         <span className="text-xs font-medium text-slate-500">
-          {session.role === 'client'
-            ? `Perfil: ${session.nombre}`
-            : 'Reserva sin cuenta o con perfil'}
+          {isDemoMode
+            ? 'Reserva directa · Sin registro'
+            : session.role === 'client'
+              ? `Perfil: ${session.nombre}`
+              : 'Reserva sin cuenta o con perfil'}
         </span>
       </div>
 
-      {/* Acceso previo rápido: Invitado vs Registrarse con Teléfono, Nombre, Ciudad */}
-      {session.role === 'guest' ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs">
-          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-900">
-                ¿Cómo prefieres sacar tu cita?
-              </p>
-              <p className="mt-0.5 text-[11px] text-slate-600">
-                Puedes reservar directo sin crear usuario, o registrarte con tu teléfono, nombre y ciudad para guardar tu historial.
-              </p>
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                onClick={() => onOpenAuthSheet('register')}
-                className="tap-feedback min-h-[40px] rounded-xl border border-slate-300 bg-slate-50 px-3 text-xs font-bold text-slate-800 hover:bg-slate-100 whitespace-nowrap"
-              >
-                Registrarme antes
-              </button>
-              <button
-                type="button"
-                onClick={onOpenInstallModal}
-                className="tap-feedback inline-flex min-h-[40px] items-center gap-1 rounded-xl border border-indigo-200 bg-indigo-50 px-3 text-xs font-bold text-indigo-800 hover:bg-indigo-100 whitespace-nowrap"
-              >
-                <Download className="h-3.5 w-3.5" />
-                App móvil
-              </button>
+      {/* Acceso previo rápido solo fuera de Demo */}
+      {!isDemoMode &&
+        (session.role === 'guest' ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs">
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-slate-900">
+                  ¿Cómo prefieres sacar tu cita?
+                </p>
+                <p className="mt-0.5 text-[11px] text-slate-600">
+                  Puedes reservar directo sin crear usuario, o registrarte con tu teléfono, nombre y ciudad para guardar tu historial.
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                {onOpenAuthSheet && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenAuthSheet('register')}
+                    className="tap-feedback min-h-[40px] rounded-xl border border-slate-300 bg-slate-50 px-3 text-xs font-bold text-slate-800 hover:bg-slate-100 whitespace-nowrap"
+                  >
+                    Registrarme antes
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onOpenInstallModal}
+                  className="tap-feedback inline-flex min-h-[40px] items-center gap-1 rounded-xl border border-indigo-200 bg-indigo-50 px-3 text-xs font-bold text-indigo-800 hover:bg-indigo-100 whitespace-nowrap"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  App móvil
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-2.5 text-xs text-emerald-900">
-          <span className="inline-flex items-center gap-1.5 font-semibold">
-            <UserCheck className="h-4 w-4 text-emerald-700" />
-            Tus datos ({session.nombre} · {session.ciudad}) se completarán automáticamente.
-          </span>
-        </div>
-      )}
+        ) : (
+          <div className="flex items-center justify-between gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-4 py-2.5 text-xs text-emerald-900">
+            <span className="inline-flex items-center gap-1.5 font-semibold">
+              <UserCheck className="h-4 w-4 text-emerald-700" />
+              Tus datos ({session.nombre} · {session.ciudad}) se completarán automáticamente.
+            </span>
+          </div>
+        ))}
 
-      {/* Indicador de pasos */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xs">
+      {/* Indicador de pasos visual y auto-guiado */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-2.5 shadow-xs sm:p-3">
         <div className="grid grid-cols-3 gap-2">
           {[
-            { num: 1, label: '1. Servicio' },
-            { num: 2, label: '2. Horario' },
-            { num: 3, label: '3. Tus datos' },
+            { num: 1, label: 'Servicio' },
+            { num: 2, label: 'Día y Hora' },
+            { num: 3, label: 'Confirmar' },
           ].map((item) => {
             const isCurrent = step === item.num;
             const isDone = step > item.num;
@@ -575,21 +595,41 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                 style={
                   isCurrent
                     ? {
-                        backgroundColor: rubro.colores.superficieDestacada,
-                        color: rubro.colores.primario,
-                        borderColor: rubro.colores.bordeSuave,
+                        backgroundColor: rubro.colores.primario,
+                        color: '#FFFFFF',
+                        borderColor: rubro.colores.primario,
                       }
-                    : undefined
-                }
-                className={`tap-feedback flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border px-2 text-xs font-semibold transition-colors ${
-                  isCurrent
-                    ? 'border'
                     : isDone
-                      ? 'border-slate-200 bg-slate-50 text-slate-800'
-                      : 'border-transparent bg-transparent text-slate-400'
+                      ? {
+                          backgroundColor: rubro.colores.superficieDestacada,
+                          color: rubro.colores.primario,
+                          borderColor: rubro.colores.bordeSuave,
+                        }
+                      : undefined
+                }
+                className={`tap-feedback flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border px-2 text-xs font-bold transition-all ${
+                  isCurrent
+                    ? 'shadow-xs'
+                    : isDone
+                      ? ''
+                      : 'border-slate-100 bg-slate-50/60 text-slate-400'
                 }`}
               >
-                {isDone && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+                <span
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold ${
+                    isCurrent
+                      ? 'bg-white/20 text-white'
+                      : isDone
+                        ? 'bg-white text-emerald-600'
+                        : 'bg-slate-200/70 text-slate-500'
+                  }`}
+                >
+                  {isDone ? (
+                    <Check className="h-3 w-3" aria-hidden="true" />
+                  ) : (
+                    item.num
+                  )}
+                </span>
                 <span className="truncate">{item.label}</span>
               </button>
             );
@@ -597,7 +637,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
         </div>
       </div>
 
-      {/* PASO 1: Servicios en tarjetas */}
+      {/* PASO 1: Servicios en tarjetas con botón prominente Elegir horario */}
       {step === 1 && (
         <section aria-labelledby="step-services-title" className="space-y-3">
           <div className="px-1">
@@ -609,14 +649,18 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                   : ''
               }`}
             >
-              Elige un servicio
+              Elige un servicio para ver horarios
             </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              {rubro.horario.diasLabel} · Precios en Soles (S/)
+            <p className="mt-0.5 text-xs text-slate-600">
+              {rubro.horario.diasLabel} · Toca{' '}
+              <strong style={{ color: rubro.colores.primario }}>
+                Elegir horario
+              </strong>{' '}
+              en la atención que prefieras.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
             {rubro.servicios.map((svc) => {
               const isSelected = selectedService?.id === svc.id;
               return (
@@ -624,18 +668,41 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                   key={svc.id}
                   type="button"
                   onClick={() => handleSelectService(svc)}
-                  style={
-                    isSelected
-                      ? {
-                          borderColor: rubro.colores.primario,
-                          backgroundColor: rubro.colores.fondoSuave,
-                        }
-                      : undefined
-                  }
-                  className="tap-feedback flex min-h-[104px] w-full flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-xs hover:border-slate-300"
+                  style={{
+                    borderColor: isSelected
+                      ? rubro.colores.primario
+                      : rubro.colores.bordeSuave,
+                    backgroundColor: isSelected
+                      ? rubro.colores.fondoSuave
+                      : '#FFFFFF',
+                  }}
+                  className="tap-feedback group flex w-full flex-col justify-between overflow-hidden rounded-3xl border text-left shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <div className="flex w-full items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
+                  <div className="relative h-36 w-full overflow-hidden bg-slate-100">
+                    <img
+                      src={svc.imagen || rubro.heroImage}
+                      alt={svc.nombre}
+                      referrerPolicy="no-referrer"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-xl bg-white/95 px-2.5 py-1 text-[11px] font-bold text-slate-800 shadow-xs backdrop-blur-xs">
+                      <Clock
+                        className="h-3 w-3"
+                        style={{ color: rubro.colores.primario }}
+                        aria-hidden="true"
+                      />
+                      {svc.duracion}
+                    </span>
+                    <span
+                      className="absolute top-2.5 right-2.5 rounded-xl px-2.5 py-1 text-sm font-extrabold text-white shadow-sm tabular-nums"
+                      style={{ backgroundColor: rubro.colores.primario }}
+                    >
+                      S/ {svc.precio}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-1 flex-col justify-between p-4">
+                    <div>
                       <h3 className="text-base font-bold text-slate-900">
                         {svc.nombre}
                       </h3>
@@ -643,25 +710,22 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                         {svc.descripcion}
                       </p>
                     </div>
-                    <span
-                      className="shrink-0 text-base font-bold tabular-nums"
-                      style={{ color: rubro.colores.primario }}
-                    >
-                      S/ {svc.precio}
-                    </span>
-                  </div>
 
-                  <div className="mt-3 flex w-full items-center justify-between border-t border-slate-100 pt-2.5 text-xs text-slate-500">
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                      {svc.duracion}
-                    </span>
-                    <span
-                      className="font-semibold"
-                      style={{ color: rubro.colores.primario }}
-                    >
-                      Elegir horario →
-                    </span>
+                    <div className="mt-3.5 flex w-full items-center justify-end pt-1">
+                      <span
+                        style={{
+                          backgroundColor: rubro.colores.primario,
+                          boxShadow: `0 6px 14px -4px ${rubro.colores.primario}55`,
+                        }}
+                        className="inline-flex min-h-[42px] w-full items-center justify-between gap-1.5 rounded-xl px-4 text-xs font-bold text-white transition-transform duration-150 group-hover:translate-x-0.5"
+                      >
+                        <span className="inline-flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                          <span>Elegir horario</span>
+                        </span>
+                        <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      </span>
+                    </div>
                   </div>
                 </button>
               );
@@ -695,17 +759,28 @@ export const BookingTab: React.FC<BookingTabProps> = ({
             </button>
           </div>
 
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-5">
             <div>
-              <label
-                htmlFor="booking-date"
-                className="block text-sm font-bold text-slate-900"
-              >
-                Elige el día
-              </label>
+              <div className="flex items-center justify-between gap-2">
+                <label
+                  htmlFor="booking-date"
+                  className="flex items-center gap-2 text-sm font-bold text-slate-900"
+                >
+                  <span
+                    className="flex h-6 w-6 items-center justify-center rounded-lg text-xs font-extrabold text-white"
+                    style={{ backgroundColor: rubro.colores.primario }}
+                  >
+                    1
+                  </span>
+                  <span>Elige el día</span>
+                </label>
+                <span className="text-xs font-medium text-slate-500">
+                  Lun a Sáb
+                </span>
+              </div>
 
               {/* Atajos rápidos para el pulgar */}
-              <div className="mt-2 grid grid-cols-3 gap-2">
+              <div className="mt-2.5 grid grid-cols-3 gap-2">
                 {quickDates.map((qd) => {
                   const active = fecha === qd.ymd;
                   return (
@@ -722,16 +797,28 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                               backgroundColor: rubro.colores.primario,
                               color: '#FFFFFF',
                               borderColor: rubro.colores.primario,
+                              boxShadow: `0 6px 16px -4px ${rubro.colores.primario}55`,
                             }
-                          : undefined
+                          : {
+                              borderColor: rubro.colores.bordeSuave,
+                            }
                       }
-                      className={`tap-feedback min-h-[44px] rounded-xl border px-2 text-xs font-semibold ${
+                      className={`tap-feedback flex min-h-[54px] flex-col items-center justify-center rounded-2xl border px-2 py-1.5 transition-all ${
                         active
-                          ? ''
-                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                          ? 'font-bold'
+                          : 'bg-slate-50/70 text-slate-800 hover:bg-white'
                       }`}
                     >
-                      {qd.label}
+                      <span className="text-xs font-bold leading-tight">
+                        {qd.label}
+                      </span>
+                      <span
+                        className={`mt-0.5 text-[10px] font-medium capitalize ${
+                          active ? 'text-white/85' : 'text-slate-500'
+                        }`}
+                      >
+                        {qd.subLabel}
+                      </span>
                     </button>
                   );
                 })}
@@ -758,11 +845,23 @@ export const BookingTab: React.FC<BookingTabProps> = ({
 
             {/* Horarios */}
             <div>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-bold text-slate-900">
-                  Elige una hora disponible
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                  <span
+                    className="flex h-6 w-6 items-center justify-center rounded-lg text-xs font-extrabold text-white"
+                    style={{ backgroundColor: rubro.colores.primario }}
+                  >
+                    2
+                  </span>
+                  <span>Toca una hora libre</span>
                 </p>
-                <span className="text-xs text-slate-500">9:00 a 19:00</span>
+                {!sundaySelected && !loadingSlots && !slotsError && (
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+                    <Check className="h-3 w-3" aria-hidden="true" />
+                    {allHourSlots.filter((s) => !isHourDisabled(s)).length}{' '}
+                    horarios libres
+                  </span>
+                )}
               </div>
 
               {sundaySelected ? (
@@ -819,7 +918,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                   {allHourSlots.map((slot) => (
                     <div
                       key={slot}
-                      className="skeleton-shimmer h-12 rounded-xl"
+                      className="skeleton-shimmer h-14 rounded-2xl"
                     />
                   ))}
                 </div>
@@ -841,21 +940,44 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                                   backgroundColor: rubro.colores.primario,
                                   borderColor: rubro.colores.primario,
                                   color: '#FFFFFF',
+                                  boxShadow: `0 8px 18px -4px ${rubro.colores.primario}66`,
                                 }
-                              : undefined
+                              : !disabled
+                                ? {
+                                    borderColor: rubro.colores.bordeSuave,
+                                  }
+                                : undefined
                           }
-                          className={`tap-feedback flex min-h-[48px] flex-col items-center justify-center rounded-xl border px-2 text-sm font-semibold tabular-nums ${
+                          className={`tap-feedback flex min-h-[58px] flex-col items-center justify-center rounded-2xl border-2 px-2 py-1.5 tabular-nums transition-all ${
                             disabled
-                              ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 line-through'
+                              ? 'cursor-not-allowed border-slate-200 bg-slate-100/80 text-slate-400'
                               : active
-                                ? 'shadow-xs'
-                                : 'border-slate-200 bg-white text-slate-900 hover:border-slate-400'
+                                ? 'scale-[1.02] font-bold'
+                                : 'bg-white text-slate-900 shadow-2xs hover:-translate-y-0.5 hover:shadow-sm'
                           }`}
                         >
-                          <span>{slot}</span>
-                          {disabled && (
-                            <span className="text-[10px] font-medium no-underline">
+                          <span
+                            className={`text-sm sm:text-base font-bold ${
+                              disabled ? 'line-through' : ''
+                            }`}
+                          >
+                            {slot}
+                          </span>
+                          {disabled ? (
+                            <span className="mt-0.5 text-[10px] font-medium text-slate-400">
                               Ocupado
+                            </span>
+                          ) : active ? (
+                            <span className="mt-0.5 inline-flex items-center gap-0.5 text-[10px] font-bold text-white/95">
+                              <Check className="h-3 w-3" aria-hidden="true" />
+                              Elegido
+                            </span>
+                          ) : (
+                            <span
+                              className="mt-0.5 text-[10px] font-bold"
+                              style={{ color: rubro.colores.primario }}
+                            >
+                              Libre
                             </span>
                           )}
                         </button>
@@ -863,7 +985,7 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                     })}
                   </div>
 
-                  {isPreviewMode && (
+                  {isPreviewMode && !isDemoMode && (
                     <p className="mt-3 text-[11px] text-slate-500">
                       Vista previa local activa. Configura{' '}
                       <code className="font-mono">SUPABASE_URL</code> y{' '}
@@ -888,10 +1010,21 @@ export const BookingTab: React.FC<BookingTabProps> = ({
                   !hora || sundaySelected || loadingSlots || !isOnline
                     ? undefined
                     : rubro.colores.primario,
+                boxShadow:
+                  !hora || sundaySelected || loadingSlots || !isOnline
+                    ? undefined
+                    : `0 10px 24px -6px ${rubro.colores.primario}66`,
               }}
-              className="tap-feedback flex min-h-[50px] w-full items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+              className="tap-feedback flex min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 text-sm font-bold text-white transition-all disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
             >
-              Continuar con tus datos
+              {hora ? (
+                <>
+                  <span>Confirmar {hora} · Ir al último paso</span>
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </>
+              ) : (
+                <span>Toca una hora libre arriba para continuar</span>
+              )}
             </button>
           </div>
         </section>
@@ -1082,8 +1215,8 @@ export const BookingTab: React.FC<BookingTabProps> = ({
               </div>
             )}
 
-            {/* Opción de guardar perfil si es invitado */}
-            {session.role === 'guest' && (
+            {/* Opción de guardar perfil si es invitado (solo fuera de Demo) */}
+            {!isDemoMode && session.role === 'guest' && (
               <label className="flex min-h-[52px] cursor-pointer items-start gap-3 rounded-2xl border border-indigo-200 bg-indigo-50/60 p-3.5">
                 <input
                   type="checkbox"
